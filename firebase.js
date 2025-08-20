@@ -17,6 +17,15 @@ const firebaseConfig = {
   appId: "1:230043715899:web:435638322c9324140f4f1e"
 };
 
+// ================= Firebase Betting System =================
+
+// Import Firebase modules (add this to your HTML head)
+// <script type="module">
+//   import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js';
+//   import { getFirestore } from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js';
+//   // ... other imports
+// </script>
+
 // Initialize Firebase
 let db;
 let betsCollection;
@@ -196,11 +205,30 @@ function initBettingDOM() {
   pituusEl = document.getElementById('pituus');
   betAmountEl = document.getElementById('betAmount');
 
-  // Enforce integer-only input for Pituus (cm)
+  // Enforce integer-only input for Pituus (cm) with range 1-130
   if (pituusEl) {
     pituusEl.addEventListener('input', (e) => {
-      const digits = e.target.value.replace(/\D+/g, '');
-      e.target.value = digits;
+      let value = e.target.value.replace(/\D+/g, ''); // Keep only digits
+      if (value) {
+        value = Math.max(1, Math.min(130, parseInt(value, 10))); // Clamp between 1-130
+        e.target.value = value;
+      } else {
+        e.target.value = '';
+      }
+      updateOddsDisplay();
+    });
+  }
+
+  // Enforce integer-only input for Summa (€) with range 1-10
+  if (betAmountEl) {
+    betAmountEl.addEventListener('input', (e) => {
+      let value = e.target.value.replace(/\D+/g, ''); // Keep only digits
+      if (value) {
+        value = Math.max(1, Math.min(10, parseInt(value, 10))); // Clamp between 1-10
+        e.target.value = value;
+      } else {
+        e.target.value = '';
+      }
       updateOddsDisplay();
     });
   }
@@ -230,6 +258,7 @@ function moveStatsToTilastotWindow() {
     statsPanel.className = 'stats-panel';
     statsPanel.id = 'statsPanel';
     statsPanel.innerHTML = `
+      <legend>Tilastot</legend>
       <div class="stats-row"><span>Vetoja yhteensä:</span> <strong id="totalBets">0</strong></div>
       <div class="stats-row"><span>Panokset yhteensä:</span> <strong id="totalAmount">0,00 €</strong></div>
       <div class="stats-row"><span>Uniikkeja yhdistelmiä:</span> <strong id="uniqueCombinations">0</strong></div>
@@ -457,19 +486,25 @@ function initBettingEventListeners() {
       const pituusRaw = document.getElementById('pituus').value.trim();
       const amount = parseFloat(document.getElementById('betAmount').value);
 
-      // Validation
+      // Enhanced validation
       if (!/^\d+$/.test(pituusRaw)) {
-        showMessage('ERROR: Pituus (cm) on kokonaisluku, esim. 102.', true);
+        showMessage('ERROR: Pituus (cm) on kokonaisluku väliltä 1-130.', true);
         return;
       }
       const pituus = parseInt(pituusRaw, 10);
+
+      if (pituus < 1 || pituus > 130) {
+        showMessage('ERROR: Pituus on oltava väliltä 1-130 cm.', true);
+        return;
+      }
 
       if (!veikkaaja || !voittaja || !pituusRaw || !amount) {
         showMessage('ERROR: Täytä kaikki kentät.', true);
         return;
       }
-      if (amount <= 0) {
-        showMessage('ERROR: Panoksen on oltava suurempi kuin 0.', true);
+      
+      if (amount < 1 || amount > 10 || !Number.isInteger(amount)) {
+        showMessage('ERROR: Summa on oltava kokonaisluku väliltä 1-10 €.', true);
         return;
       }
 
