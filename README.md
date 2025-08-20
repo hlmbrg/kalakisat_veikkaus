@@ -1,1 +1,0 @@
-# kalakisat_veikkaus

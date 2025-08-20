@@ -1,0 +1,225 @@
+<!doctype html>
+<html lang="fi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Win98 Desk</title>
+
+  <!-- 98.css -->
+  <link rel="stylesheet" href="https://unpkg.com/98.css" />
+
+  <!-- App styles -->
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <!-- ================= DESKTOP ================= -->
+  <div class="desktop" id="desktop">
+
+    <!-- 1) My Computer -->
+    <div class="desktop-icon icon-mycomputer" data-app="mycomputer" tabindex="0">
+      <div class="icon-image" aria-hidden="true"></div>
+      <span>My Computer</span>
+    </div>
+
+    <!-- 2) Veikkaus -->
+    <div class="desktop-icon icon-betting" data-app="betting" tabindex="0">
+      <div class="icon-image" aria-hidden="true"></div>
+      <span>Veikkaus</span>
+    </div>
+
+    <!-- 3) Veikkaukset -->
+    <div class="desktop-icon icon-betsdata" data-app="betsdata" tabindex="0">
+      <div class="icon-image" aria-hidden="true"></div>
+      <span>Veikkaukset</span>
+    </div>
+
+    <!-- 4) Tilastot -->
+    <div class="desktop-icon icon-stats" data-app="tilastot" tabindex="0">
+      <div class="icon-image" aria-hidden="true"></div>
+      <span>Tilastot</span>
+    </div>
+
+    <!-- 5) Säännöt -->
+    <div class="desktop-icon icon-rules" data-app="rules" tabindex="0">
+      <div class="icon-image" aria-hidden="true"></div>
+      <span>Säännöt</span>
+    </div>
+
+    <!-- 6) Recycle Bin -->
+    <div class="desktop-icon icon-recycleBin" data-app="recyclebin" tabindex="0">
+      <div class="icon-image" aria-hidden="true"></div>
+      <span>Recycle Bin</span>
+    </div>
+  </div>
+
+  <!-- ================= WINDOWS ================= -->
+
+  <!-- Veikkaus (betting) window -->
+  <div class="window app-window" id="window-betting" style="display:block;">
+    <div class="title-bar">
+      <div class="title-bar-text">Veikkaus</div>
+      <div class="title-bar-controls">
+        <button aria-label="Minimize" onclick="minimizeWindow('window-betting')"></button>
+        <button aria-label="Maximize" onclick="maximizeWindow('window-betting')"></button>
+        <button aria-label="Close" onclick="closeWindow('window-betting')"></button>
+      </div>
+    </div>
+    <div class="window-body">
+
+      <div id="successMessage" class="message success-message"></div>
+      <div id="errorMessage" class="message error-message"></div>
+
+      <form id="betForm">
+        <div class="field-row">
+          <label for="veikkaaja" style="min-width: 140px;">Veikkaaja</label>
+          <input id="veikkaaja" type="text" placeholder="Nimesi" required />
+        </div>
+        <div class="field-row">
+          <label for="voittaja" style="min-width: 140px;">Voittaja</label>
+          <select id="voittaja" required>
+            <option value="" selected disabled hidden>-- Valitse voittaja --</option>
+            <option value="Ville">Ville</option>
+            <option value="Antti">Antti</option>
+            <option value="Jaakko">Jaakko</option>
+            <option value="Joel">Joel</option>
+            <option value="Jon">Jon</option>
+            <option value="Joonas">Joonas</option>
+            <option value="Markus">Markus</option>
+            <option value="Matias">Matias</option>
+            <option value="Mika">Mika</option>
+            <option value="Pyry">Pyry</option>
+            <option value="Samu">Samu</option>
+            <option value="Tommi">Tommi</option>
+            <option value="VP">VP</option>
+          </select>
+        </div>
+        <div class="field-row">
+          <label for="pituus" style="min-width: 140px;">Pituus (cm)</label>
+          <input id="pituus" min="1" step="1" max="130" placeholder="1-130" required />
+        </div>
+        <div class="field-row">
+          <label for="betAmount" style="min-width: 140px;">Summa (€)</label>
+          <input id="betAmount" min="1" step="1" max="10" placeholder="1-10" required />
+        </div>
+
+        <div class="odds-display">
+          Alustava kerroin: <span class="odds-value" id="currentOdds">--.--</span>
+        </div>
+        <div class="winnings-display">
+          Mahdollinen voitto: <span class="winnings-value" id="possibleWinnings">0,00 €</span>
+        </div>
+
+        <div class="info-box">
+          Kerroin ≈ Kokonaispotti / (kohteeseen panostettu summa + panos)
+        </div>
+
+        <button class="submit-btn" type="submit">Aseta veto</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Veikkaukset window (ONLY bets list now) -->
+  <div class="window app-window" id="window-bets" style="display:block;">
+    <div class="title-bar">
+      <div class="title-bar-text">Veikkaukset</div>
+      <div class="title-bar-controls">
+        <button aria-label="Minimize" onclick="minimizeWindow('window-bets')"></button>
+        <button aria-label="Maximize" onclick="maximizeWindow('window-bets')"></button>
+        <button aria-label="Close" onclick="closeWindow('window-bets')"></button>
+      </div>
+    </div>
+    <div class="window-body">
+      <!-- Only the bets list, no stats -->
+      <div class="bet-list" id="betsList"></div>
+    </div>
+  </div>
+
+  <!-- Tilastot window (stats moved here) -->
+  <div class="window app-window" id="window-stats" style="display:none;">
+    <div class="title-bar">
+      <div class="title-bar-text">Tilastot</div>
+      <div class="title-bar-controls">
+        <button aria-label="Minimize" onclick="minimizeWindow('window-stats')"></button>
+        <button aria-label="Maximize" onclick="maximizeWindow('window-stats')"></button>
+        <button aria-label="Close" onclick="closeWindow('window-stats')"></button>
+      </div>
+    </div>
+    <div class="window-body">
+      <!-- Stats content will be created dynamically by JavaScript -->
+    </div>
+  </div>
+
+  <!-- Säännöt window -->
+  <div class="window app-window" id="window-rules" style="display:none;">
+    <div class="title-bar">
+      <div class="title-bar-text">Säännöt</div>
+      <div class="title-bar-controls">
+        <button aria-label="Minimize" onclick="minimizeWindow('window-rules')"></button>
+        <button aria-label="Maximize" onclick="maximizeWindow('window-rules')"></button>
+        <button aria-label="Close" onclick="closeWindow('window-rules')"></button>
+      </div>
+    </div>
+    <div class="window-body">
+      <div id="rulesContent" class="notepad-content">Ladataan sääntöjä...</div>
+    </div>
+  </div>
+
+  <!-- My Computer window -->
+  <div class="window app-window" id="window-mycomputer" style="display:none;">
+    <div class="title-bar">
+      <div class="title-bar-text">My Computer</div>
+      <div class="title-bar-controls">
+        <button aria-label="Minimize" onclick="minimizeWindow('window-mycomputer')"></button>
+        <button aria-label="Maximize" onclick="maximizeWindow('window-mycomputer')"></button>
+        <button aria-label="Close" onclick="closeWindow('window-mycomputer')"></button>
+      </div>
+    </div>
+    <div class="window-body">
+      <div class="computer-content">
+        <div class="drive-icon">
+          <div class="drive-image"></div>
+          <div class="drive-label">Local Disk (C:)</div>
+        </div>
+        <div class="drive-icon">
+          <div class="drive-image"></div>
+          <div class="drive-label">Tissikuvat (D:)</div>
+        </div>
+        <div class="drive-icon">
+          <div class="drive-image"></div>
+          <div class="drive-label">Kalakuvat (E:)</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recycle Bin window -->
+  <div class="window app-window" id="window-recycle" style="display:none;">
+    <div class="title-bar">
+      <div class="title-bar-text">Recycle Bin</div>
+      <div class="title-bar-controls">
+        <button aria-label="Minimize" onclick="minimizeWindow('window-recycle')"></button>
+        <button aria-label="Maximize" onclick="maximizeWindow('window-recycle')"></button>
+        <button aria-label="Close" onclick="closeWindow('window-recycle')"></button>
+      </div>
+    </div>
+    <div class="window-body">
+      <div class="folder-empty">Tämä kansio on tyhjä.</div>
+    </div>
+  </div>
+
+  <!-- ================= TASKBAR ================= -->
+  <div class="taskbar">
+    <button class="start-button" id="startBtn">
+      <img src="icons/windows.png" alt="Windows" class="start-icon" />
+      Start
+    </button>
+    <div class="taskbar-buttons" id="taskbarButtons"></div>
+    <div class="taskbar-time"><span id="currentTime">--:--:--</span></div>
+  </div>
+
+  <!-- App scripts -->
+  <script src="firebase.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>

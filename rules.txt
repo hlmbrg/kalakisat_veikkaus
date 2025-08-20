@@ -1,0 +1,34 @@
+KALAKISA VEIKKAUKSEN SÄÄNNÖT
+==========================
+
+1. YLEISTÄ
+- Jokainen voi asettaa vetoja
+- Kertoimet lasketaan automaattisesti
+- Vedot ovat sitovia
+
+2. KERTOIMIEN LASKENTA
+Kaava: Kokonaispotti / (Tulokselle asetettu summa)
+
+ESIM: Matias 105cm tulokselle on pelattu 2€. Kokonaispotti on 256€
+    niin silloin 1€ panoksella voittaa 128€. 
+
+3. OIKEA TULOS
+Vetosi on oikein vain jos SEKÄ voittaja että pituus ovat oikein.
+
+4. PYÖRISTYS
+Kalan pituus pyöristetään ylöspäin. 105.5cm -> 106cm. 
+
+5. EI TULOSTA
+Jos täysin oikeaa tulosta ei ole niin oikeaa kalastaa ja lähimmäksi oikeaa pituutta
+    veikannut valitaan voittajaksi. 
+
+4. MAKSUT
+- Vedot maksetaan etukäteen
+- Voitot jaetaan tapahtuman jälkeen
+
+5. KIELLOT
+Ei saa muuttaa vetoa sen jälkeen kun tapahtuma on alkanut
+ 
+ 
+========================
+Viimeksi päivitetty: 20.8.2025
