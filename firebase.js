@@ -17,15 +17,6 @@ const firebaseConfig = {
   appId: "1:230043715899:web:435638322c9324140f4f1e"
 };
 
-// ================= Firebase Betting System =================
-
-// Import Firebase modules (add this to your HTML head)
-// <script type="module">
-//   import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js';
-//   import { getFirestore } from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js';
-//   // ... other imports
-// </script>
-
 // Initialize Firebase
 let db;
 let betsCollection;
@@ -205,6 +196,9 @@ function initBettingDOM() {
   pituusEl = document.getElementById('pituus');
   betAmountEl = document.getElementById('betAmount');
 
+  // Load saved values
+  loadSavedFormValues();
+
   // Enforce integer-only input for Pituus (cm) with range 1-130
   if (pituusEl) {
     pituusEl.addEventListener('input', (e) => {
@@ -233,9 +227,52 @@ function initBettingDOM() {
     });
   }
 
-  // Add change listener for dropdown
+  // Add change listener for dropdown and save selection
   if (voittajaEl) {
-    voittajaEl.addEventListener('change', updateOddsDisplay);
+    voittajaEl.addEventListener('change', (e) => {
+      saveFormValue('lastWinner', e.target.value);
+      updateOddsDisplay();
+    });
+  }
+
+  // Save veikkaaja name when it changes
+  const veikkaajaEl = document.getElementById('veikkaaja');
+  if (veikkaajaEl) {
+    veikkaajaEl.addEventListener('input', (e) => {
+      saveFormValue('lastVeikkaaja', e.target.value);
+    });
+  }
+}
+
+// Load saved form values from localStorage
+function loadSavedFormValues() {
+  try {
+    // Load last veikkaaja name
+    const lastVeikkaaja = localStorage.getItem('betting_lastVeikkaaja');
+    if (lastVeikkaaja && document.getElementById('veikkaaja')) {
+      document.getElementById('veikkaaja').value = lastVeikkaaja;
+    }
+
+    // Load last winner selection
+    const lastWinner = localStorage.getItem('betting_lastWinner');
+    if (lastWinner && document.getElementById('voittaja')) {
+      document.getElementById('voittaja').value = lastWinner;
+    }
+
+    console.log('Loaded saved form values:', { lastVeikkaaja, lastWinner });
+  } catch (error) {
+    console.error('Error loading saved form values:', error);
+  }
+}
+
+// Save form value to localStorage
+function saveFormValue(key, value) {
+  try {
+    if (value && value.trim()) {
+      localStorage.setItem(`betting_${key}`, value.trim());
+    }
+  } catch (error) {
+    console.error('Error saving form value:', error);
   }
 }
 
@@ -508,6 +545,10 @@ function initBettingEventListeners() {
         return;
       }
 
+      // Save the values before submitting (in case of success)
+      saveFormValue('lastVeikkaaja', veikkaaja);
+      saveFormValue('lastWinner', voittaja);
+
       // Calculate odds and create bet object
       const odds = calculateOdds(voittaja, String(pituus), amount);
       const newBet = {
@@ -526,8 +567,13 @@ function initBettingEventListeners() {
         // Save to Firebase
         const savedBet = await saveBetToFirebase(newBet);
         
-        // Update UI
+        // Reset form but keep saved values
         form.reset();
+        
+        // Restore the saved values after reset
+        loadSavedFormValues();
+        
+        // Update odds display
         updateOddsDisplay();
         showMessage(`Veto tallennettu! Kerroin: ${odds.toFixed(2)}, Mahdollinen voitto: ${formatCurrency(amount * odds)} 🔥`);
         
