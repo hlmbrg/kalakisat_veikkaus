@@ -295,7 +295,7 @@ function moveStatsToTilastotWindow() {
     statsPanel.className = 'stats-panel';
     statsPanel.id = 'statsPanel';
     statsPanel.innerHTML = `
-      <legend>Tilastot</legend>
+    <h4>Tilastot</h4>
       <div class="stats-row"><span>Vetoja yhteensä:</span> <strong id="totalBets">0</strong></div>
       <div class="stats-row"><span>Panokset yhteensä:</span> <strong id="totalAmount">0,00 €</strong></div>
       <div class="stats-row"><span>Uniikkeja yhdistelmiä:</span> <strong id="uniqueCombinations">0</strong></div>
@@ -411,7 +411,7 @@ function updateStats() {
   // Update connection status
   const statusEl = document.getElementById('connectionStatus');
   if (statusEl) {
-    statusEl.textContent = firebaseUtils ? '🟢 Yhdistetty' : '🔴 Offline-tila';
+    statusEl.textContent = firebaseUtils ? 'Yhdistetty' : 'Offline';
   }
 }
 

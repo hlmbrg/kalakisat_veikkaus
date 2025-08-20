@@ -1,33 +1,10 @@
-/* ================== Fonts (Pixel Operator) ================== */
-@font-face {
-  font-family: 'Pixel Operator';
-  src: url('fonts/PixelOperator.ttf') format('truetype');
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: 'Pixel Operator';
-  src: url('fonts/PixelOperator-Bold.ttf') format('truetype');
-  font-weight: 700;
-  font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: 'Pixel Operator Mono';
-  src: url('fonts/PixelOperatorMono.ttf') format('truetype');
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
-
 /* ================== Global baseline (ONE font + size everywhere) ================== */
 html, body {
   height: 100%;
   margin: 0;
   background: #008080;
-  font-family: 'Pixel Operator', 'MS Sans Serif', Tahoma, Arial, sans-serif;
-  font-size: 20px;         /* global default size */
+  font-family: 'MS Sans Serif', Tahoma, Arial, sans-serif;
+  font-size: 15px;         /* global default size */
   line-height: 1.25;
   overflow: hidden;
   user-select: none;
@@ -41,8 +18,6 @@ body {
 
 /* Inherit font + size across all elements (including 98.css components) */
 * {
-  font-family: inherit !important;
-  font-size: inherit !important;
   -webkit-font-smoothing: auto;
   -moz-osx-font-smoothing: auto;
   text-rendering: optimizeSpeed;
@@ -51,8 +26,8 @@ body {
 
 /* Utilities */
 .font-small { font-size: 14px !important; }
-.font-large { font-size: 28px !important; }
-.font-mono  { font-family: 'Pixel Operator Mono', monospace !important; }
+.font-large { font-size: 20px !important; }
+.font-mono  { font-family: 'MS Sans Serif', monospace !important; }
 
 /* Bigger controls */
 button, input, select, textarea { min-height: 34px; }
@@ -243,7 +218,7 @@ textarea { min-height: 160px; }
 }
 
 .bar-label {
-  font-size: 10px;
+  font-size: 12px;
   color: #fff;
   text-align: center;
   margin-top: 2px;
@@ -261,7 +236,7 @@ textarea { min-height: 160px; }
   display: flex;
   align-items: center;
   gap: 4px;
-  font-size: 11px;
+  font-size: 12px;
 }
 
 .legend-color {
@@ -329,7 +304,7 @@ textarea { min-height: 160px; }
   padding-bottom:4px; 
 }
 
-.bet-amount { font-weight:bold; color:#008000; font-size: 18px; }
+.bet-amount { font-weight:bold; color:#008000; font-size: 15px; }
 
 .bet-time { 
   background:#0066cc; 
@@ -345,7 +320,7 @@ textarea { min-height: 160px; }
   margin-top:6px; 
   border-top:1px solid #e0e0e0; 
   padding-top:4px;
-  font-size: 14px;
+  font-size: 10px;
 }
 
 .group-header { 
