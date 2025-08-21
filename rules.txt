@@ -5,30 +5,34 @@ KALAKISA VEIKKAUKSEN SÄÄNNÖT
 - Jokainen voi asettaa vetoja
 - Kertoimet lasketaan automaattisesti
 - Vedot ovat sitovia
+- Epärehellinen toiminta johtaa vetojen mitätöintiin
 
 2. KERTOIMIEN LASKENTA
-Kaava: Kokonaispotti / (Tulokselle asetettu summa)
+Kaava: Kokonaispotti / (Voittajalle asetettu summa)
 
-ESIM: Matias 105cm tulokselle on pelattu 2€. Kokonaispotti on 256€
-    niin silloin 1€ panoksella voittaa 128€. 
+ESIM: Matiakselle on pelattu yhteensä 50€. Kokonaispotti on 250€
+    niin silloin 10€ panoksella Matiakseen voittaa 50€. 
 
 3. OIKEA TULOS
-Vetosi on oikein vain jos SEKÄ voittaja että pituus ovat oikein.
+- Vetosi on oikein vain jos valitsemasi kilpailija voittaa kisan
 
-4. PYÖRISTYS
-Kalan pituus pyöristetään ylöspäin. 105.5cm -> 106cm. 
+4. VOITON MÄÄRITTÄMINEN
+- Kilpailun voittaja on se, joka saa suurimman kalan
+- Jos useampi saa saman pituuden niin kilpailu ratkaistaan 
+    seuraavaksi isoimman kalan perusteella ja sen jälkeen arvalla
 
-5. EI TULOSTA
-Jos täysin oikeaa tulosta ei ole niin oikeaa kalastaa ja lähimmäksi oikeaa pituutta
-    veikannut valitaan voittajaksi. 
-
-4. MAKSUT
+5. MAKSUT
 - Vedot maksetaan etukäteen
-- Voitot jaetaan tapahtuman jälkeen
+- Voitot jaetaan tapahtuman jälkeen 24h sisällä
 
-5. KIELLOT
-Ei saa muuttaa vetoa sen jälkeen kun tapahtuma on alkanut
- 
+6. EI VOITTAJAA
+- Jos kilpailussa ei onnistuta samaana lainkaan kohde kalaa niin
+    panokset palautetaan osallistujille
+
+7. RIITA-ASIAT
+- Epäselvissä tilanteissa päättää kisatoimikunta (viime vuoden top3)
+- Valitukset tulee tehdä 24h sisällä tuloksen julkistamisesta
+- Päätökset ovat lopullisia
  
 ========================
-Viimeksi päivitetty: 20.8.2025
+Viimeksi päivitetty: 21.8.2025

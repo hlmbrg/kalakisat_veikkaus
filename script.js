@@ -12,6 +12,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   window.maximizeWindow = maximizeWindow;
   window.closeWindow = closeWindow;
   window.activateWindow = activateWindow;
+  window.openWindow = openWindow;
   
   initDesktopSystem();
   
@@ -26,16 +27,57 @@ document.addEventListener('DOMContentLoaded', async () => {
   updateTime();
   setInterval(updateTime, 1000);
 
-  renameVeikkausDataToVeikkaukset();
+  // ================= STARTUP WINDOWS CONFIGURATION =================
+  // Configure which windows open at startup here:
   
-  // Start with Veikkaus and Veikkaukset windows open
-  activateWindow('window-betting');
+  const startupWindows = [
+    'window-betting',    // Veikkaus window
+    'window-bets',       // Veikkaukset window  
+    // 'window-stats',      // Tilastot window (commented out = closed)
+    // 'window-mycomputer', // Oma tietokone (commented out = closed)
+    // 'window-rules',      // Säännöt (commented out = closed)
+    // 'window-recycle'     // Roskakori (commented out = closed)
+  ];
   
-  // Also open Veikkaukset window but don't make it active
-  const veikkauksetWindow = document.getElementById('window-bets');
-  if (veikkauksetWindow) {
-    veikkauksetWindow.dataset.wasOpened = 'true';
-    veikkauksetWindow.style.display = 'block';
+  // Set the active window (the one that gets focus)
+  const activeStartupWindow = 'window-betting';
+  
+  // ================= APPLY STARTUP CONFIGURATION =================
+  
+  // First, ensure ALL windows are hidden and not marked as opened
+  document.querySelectorAll('.app-window').forEach(win => {
+    win.style.display = 'none';
+    win.dataset.wasOpened = 'false';
+    win.classList.remove('active');
+    win.classList.add('inactive');
+  });
+  
+  // Open only the startup windows
+  startupWindows.forEach(windowId => {
+    const window = document.getElementById(windowId);
+    if (window) {
+      window.dataset.wasOpened = 'true';
+      window.style.display = 'block';
+      console.log(`Opening startup window: ${windowId}`);
+      
+      // Special handling for rules window at startup
+      if (windowId === 'window-rules') {
+        loadRules();
+      }
+    }
+  });
+  
+  // Activate the primary window (only if it's in the startup list)
+  if (startupWindows.length > 0) {
+    let windowToActivate = activeStartupWindow;
+    
+    // Make sure the activeStartupWindow is actually in the startup list
+    if (!startupWindows.includes(activeStartupWindow)) {
+      windowToActivate = startupWindows[0]; // Fallback to first window
+    }
+    
+    console.log(`Activating startup window: ${windowToActivate}`);
+    activateWindow(windowToActivate);
   }
   
   updateTaskbar();
@@ -45,7 +87,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 function initDesktopSystem() {
   initWindowDragging();
   initDesktopIcons();
-  initWindowClickToFront(); // Add click-to-front functionality
+  initWindowClickToFront();
 }
 
 // ================= Window Click-to-Front =================
@@ -90,6 +132,12 @@ function activateWindow(windowId) {
     return;
   }
 
+  // Only activate if window is already visible or meant to be opened
+  if (win.style.display === 'none') {
+    console.log(`Cannot activate hidden window: ${windowId}`);
+    return;
+  }
+
   // Mark window as having been opened
   win.dataset.wasOpened = 'true';
 
@@ -102,22 +150,39 @@ function activateWindow(windowId) {
   // Activate target window and bring it to front
   win.classList.add('active');
   win.classList.remove('inactive');
-  win.style.display = 'block';
   win.style.zIndex = ++currentZIndex; // Increment and assign new z-index
   activeWindow = windowId;
-
-  // Special handling for rules window
-  if (windowId === 'window-rules') {
-    loadRules();
-  }
 
   // Special handling for stats window - ensure stats are updated
   if (windowId === 'window-stats' && window.bettingSystem) {
     window.bettingSystem.updateStats();
   }
 
+  // Note: Rules loading is now handled in openWindow() when first opened
+
   updateTaskbar();
   console.log(`Activated window: ${windowId} with z-index: ${currentZIndex}`);
+}
+
+// New function to open a window (used by desktop icons)
+function openWindow(windowId) {
+  const win = document.getElementById(windowId);
+  if (!win) {
+    console.error(`Window ${windowId} not found`);
+    return;
+  }
+  
+  // Show the window first
+  win.style.display = 'block';
+  win.dataset.wasOpened = 'true';
+  
+  // Special handling for rules window - load rules when first opened
+  if (windowId === 'window-rules') {
+    loadRules();
+  }
+  
+  // Then activate it
+  activateWindow(windowId);
 }
 
 function minimizeWindow(windowId) {
@@ -217,9 +282,16 @@ function updateTaskbar() {
       if (isMinimized) {
         // Restore minimized window
         win.style.display = 'block';
+        win.dataset.wasOpened = 'true';
+        
+        // Special handling for rules window - load rules when restored
+        if (id === 'window-rules') {
+          loadRules();
+        }
+        
         activateWindow(id);
       } else {
-        // Just activate the window
+        // Just activate the window (don't open if it's closed)
         activateWindow(id);
       }
     };
@@ -286,7 +358,7 @@ function initDesktopIcons() {
       const targetId = app === 'mycomputer' ? 'window-mycomputer'
                      : app === 'betting'    ? 'window-betting'
                      : app === 'betsdata'   ? 'window-bets'
-                     : app === 'tilastot'   ? 'window-stats'
+                     : app === 'stats'      ? 'window-stats'
                      : app === 'rules'      ? 'window-rules'
                      : app === 'recyclebin' ? 'window-recycle'
                      : null;
@@ -305,8 +377,8 @@ function initDesktopIcons() {
       }
       
       console.log(`Opening window: ${targetId}`);
-      // activateWindow will handle setting display: block and wasOpened flag
-      activateWindow(targetId);
+      // Use openWindow instead of activateWindow for desktop icons
+      openWindow(targetId);
     });
     
     icon.addEventListener('click', () => {
@@ -350,13 +422,4 @@ function loadRules() {
       el.textContent = 'Sääntöjen lataaminen epäonnistui.'; 
       console.error(err); 
     });
-}
-
-// ================= Rename function =================
-function renameVeikkausDataToVeikkaukset() {
-  const iconSpan = document.querySelector('.icon-betsdata span');
-  if (iconSpan) iconSpan.textContent = 'Veikkaukset';
-  
-  const title = document.querySelector('#window-bets .title-bar-text');
-  if (title) title.textContent = 'Veikkaukset';
 }

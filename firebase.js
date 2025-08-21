@@ -1,11 +1,4 @@
-// ================= Firebase Betting System =================
-
-// Import Firebase modules (add this to your HTML head)
-// <script type="module">
-//   import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js';
-//   import { getFirestore } from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js';
-//   // ... other imports
-// </script>
+// ================= Firebase Betting System - Simplified =================
 
 // Firebase configuration - replace with your config
 const firebaseConfig = {
@@ -44,9 +37,8 @@ let firebaseUtils = null;
 
 // DOM refs for betting
 let betForm, betsList, successMessage, errorMessage;
-let totalBetsEl, totalAmountEl, uniqueCombinationsEl;
 let currentOddsEl, possibleWinningsEl;
-let voittajaEl, pituusEl, betAmountEl;
+let voittajaEl, betAmountEl;
 
 // ================= Firebase Betting Functions =================
 
@@ -72,15 +64,21 @@ async function loadBetsFromFirebase() {
     // Clear loading message
     if (successMessage) successMessage.style.display = 'none';
     
+    // Update connection status
+    updateConnectionStatus(true);
+    
     return bets;
     
   } catch (error) {
     console.error('Error loading bets from Firebase:', error);
     showMessage(`Virhe ladattaessa vetoja: ${error.message}`, true);
     
+    // Update connection status
+    updateConnectionStatus(false);
+    
     // Fallback to localStorage
     try {
-      const raw = localStorage.getItem('bets_v1');
+      const raw = localStorage.getItem('bets_v2_simplified');
       bets = raw ? JSON.parse(raw) : [];
       showMessage(`Firebase ei käytettävissä, käytetään paikallista tallennusta. Ladattu ${bets.length} vetoa.`, false);
     } catch (storageError) {
@@ -112,26 +110,32 @@ async function saveBetToFirebase(betData) {
     
     // Also save to localStorage as backup
     try {
-      const raw = localStorage.getItem('bets_v1');
+      const raw = localStorage.getItem('bets_v2_simplified');
       const localBets = raw ? JSON.parse(raw) : [];
       localBets.push(savedBet);
-      localStorage.setItem('bets_v1', JSON.stringify(localBets));
+      localStorage.setItem('bets_v2_simplified', JSON.stringify(localBets));
     } catch (e) {
       // Ignore localStorage errors
     }
+    
+    // Update connection status
+    updateConnectionStatus(true);
     
     return savedBet;
     
   } catch (error) {
     console.error('Error saving bet to Firebase:', error);
     
+    // Update connection status
+    updateConnectionStatus(false);
+    
     // Fallback to localStorage
     try {
-      const raw = localStorage.getItem('bets_v1');
+      const raw = localStorage.getItem('bets_v2_simplified');
       const localBets = raw ? JSON.parse(raw) : [];
       const localBet = { id: generateId(), ...betData };
       localBets.push(localBet);
-      localStorage.setItem('bets_v1', JSON.stringify(localBets));
+      localStorage.setItem('bets_v2_simplified', JSON.stringify(localBets));
       
       console.log('Saved bet to localStorage (Firebase fallback)');
       return localBet;
@@ -162,8 +166,15 @@ async function setupRealtimeListener() {
       if (JSON.stringify(newBets) !== JSON.stringify(bets)) {
         bets = newBets;
         renderBets();
+        updateStats();
         console.log(`Real-time update: ${bets.length} bets loaded`);
       }
+      
+      // Update connection status
+      updateConnectionStatus(true);
+    }, (error) => {
+      console.error('Real-time listener error:', error);
+      updateConnectionStatus(false);
     });
     
     console.log('Real-time listener set up');
@@ -171,6 +182,7 @@ async function setupRealtimeListener() {
     
   } catch (error) {
     console.error('Error setting up real-time listener:', error);
+    updateConnectionStatus(false);
   }
 }
 
@@ -178,7 +190,6 @@ async function setupRealtimeListener() {
 
 function initFirebaseBettingSystem() {
   initBettingDOM();
-  moveStatsToTilastotWindow();
   initBettingEventListeners();
   
   // Set up real-time listener
@@ -193,32 +204,17 @@ function initBettingDOM() {
   currentOddsEl = document.getElementById('currentOdds');
   possibleWinningsEl = document.getElementById('possibleWinnings');
   voittajaEl = document.getElementById('voittaja');
-  pituusEl = document.getElementById('pituus');
   betAmountEl = document.getElementById('betAmount');
 
   // Load saved values
   loadSavedFormValues();
 
-  // Enforce integer-only input for Pituus (cm) with range 1-130
-  if (pituusEl) {
-    pituusEl.addEventListener('input', (e) => {
-      let value = e.target.value.replace(/\D+/g, ''); // Keep only digits
-      if (value) {
-        value = Math.max(1, Math.min(130, parseInt(value, 10))); // Clamp between 1-130
-        e.target.value = value;
-      } else {
-        e.target.value = '';
-      }
-      updateOddsDisplay();
-    });
-  }
-
-  // Enforce integer-only input for Summa (€) with range 1-10
+  // Enforce integer-only input for Summa (€) with range 1-200
   if (betAmountEl) {
     betAmountEl.addEventListener('input', (e) => {
       let value = e.target.value.replace(/\D+/g, ''); // Keep only digits
       if (value) {
-        value = Math.max(1, Math.min(10, parseInt(value, 10))); // Clamp between 1-10
+        value = Math.max(1, Math.min(200, parseInt(value, 10))); // Clamp between 1-200
         e.target.value = value;
       } else {
         e.target.value = '';
@@ -244,7 +240,7 @@ function initBettingDOM() {
   }
 }
 
-// Load saved form values from localStorage
+// Load saved form values
 function loadSavedFormValues() {
   try {
     // Load last veikkaaja name
@@ -276,64 +272,27 @@ function saveFormValue(key, value) {
   }
 }
 
-function moveStatsToTilastotWindow() {
-  // Remove stats panel from other windows
-  const statsInBetting = document.querySelector('#window-betting .stats-panel');
-  if (statsInBetting) statsInBetting.remove();
-  
-  const statsInBets = document.querySelector('#window-bets .stats-panel');
-  if (statsInBets) statsInBets.remove();
-
-  // Create stats in Tilastot window
-  const tilastotWindow = document.getElementById('window-stats');
-  const tilastotBody = tilastotWindow?.querySelector('.window-body');
-  
-  if (tilastotBody) {
-    tilastotBody.innerHTML = '';
-    
-    const statsPanel = document.createElement('fieldset');
-    statsPanel.className = 'stats-panel';
-    statsPanel.id = 'statsPanel';
-    statsPanel.innerHTML = `
-    <h4>Tilastot</h4>
-      <div class="stats-row"><span>Vetoja yhteensä:</span> <strong id="totalBets">0</strong></div>
-      <div class="stats-row"><span>Panokset yhteensä:</span> <strong id="totalAmount">0,00 €</strong></div>
-      <div class="stats-row"><span>Uniikkeja yhdistelmiä:</span> <strong id="uniqueCombinations">0</strong></div>
-      <div class="stats-row"><span>Aktiivisia käyttäjiä:</span> <strong id="activePlayers">0</strong></div>
-
-      <div class="stats-sublist">
-        <h4>Vedot kilpailijoittain</h4>
-        <ul id="statsByCompetitor"></ul>
-      </div>
-      
-      <div class="stats-sublist">
-        <h4>Vedot pituuksittain</h4>
-        <div id="lengthChart" class="length-chart"></div>
-        <ul id="statsByLength"></ul>
-      </div>
-      
-      <div class="firebase-status">
-        <div id="connectionStatus">🔄 Yhdistetään...</div>
-      </div>
-    `;
-    
-    tilastotBody.appendChild(statsPanel);
-    
-    // Update DOM references
-    totalBetsEl = document.getElementById('totalBets');
-    totalAmountEl = document.getElementById('totalAmount');
-    uniqueCombinationsEl = document.getElementById('uniqueCombinations');
+// Update connection status indicator
+function updateConnectionStatus(isConnected) {
+  const statusEl = document.getElementById('connectionStatus');
+  if (statusEl) {
+    if (isConnected) {
+      statusEl.textContent = 'Yhdistetty Firebase';
+      statusEl.style.color = '#90EE90';
+    } else {
+      statusEl.textContent = 'Offline-tila';
+      statusEl.style.color = '#FFB6C1';
+    }
   }
 }
 
-// ================= Betting Logic (same as before) =================
+// ================= Betting Logic =================
 function updateOddsDisplay() {
   const voittaja = (document.getElementById('voittaja') || {}).value?.trim() || '';
-  const pituus = (document.getElementById('pituus') || {}).value?.trim() || '';
   const amount = parseFloat((document.getElementById('betAmount') || {}).value) || 0;
 
-  if (voittaja && pituus && amount > 0) {
-    const odds = calculateOdds(voittaja, pituus, amount);
+  if (voittaja && amount > 0) {
+    const odds = calculateOdds(voittaja, amount);
     document.getElementById('currentOdds').textContent = odds.toFixed(2);
     document.getElementById('possibleWinnings').textContent = formatCurrency(amount * odds);
   } else {
@@ -342,20 +301,19 @@ function updateOddsDisplay() {
   }
 }
 
-function calculateOdds(voittaja, pituus, currentAmount = 0) {
+function calculateOdds(voittaja, currentAmount = 0) {
   const totalBets = bets.length || 1;
   const totalAmount = bets.reduce((sum, bet) => sum + bet.amount, 0) + currentAmount;
   
-  // Find matching bets (same winner + same length)
+  // Find matching bets (same winner)
   const matching = bets.filter(b => 
-    b.voittaja.toLowerCase() === voittaja.toLowerCase() && 
-    String(b.pituus).toLowerCase() === String(pituus).toLowerCase()
+    b.voittaja.toLowerCase() === voittaja.toLowerCase()
   );
   
   const matchingCount = matching.length;
   const matchingAmount = matching.reduce((sum, bet) => sum + bet.amount, 0) + currentAmount;
   
-  // Calculate odds: Total pool / Amount bet on this combination
+  // Calculate odds: Total pool / Amount bet on this winner
   const odds = totalAmount / matchingAmount;
   
   // Ensure minimum odds of 1.01
@@ -363,96 +321,133 @@ function calculateOdds(voittaja, pituus, currentAmount = 0) {
 }
 
 function updateStats() {
+  const totalBetsEl = document.getElementById('totalBets');
+  const totalAmountEl = document.getElementById('totalAmount');
+  const activePlayersEl = document.getElementById('activePlayers');
+  const averageBetEl = document.getElementById('averageBet');
+
   if (totalBetsEl) totalBetsEl.textContent = bets.length;
   if (totalAmountEl) {
     totalAmountEl.textContent = formatCurrency(bets.reduce((s, b) => s + (Number(b.amount) || 0), 0));
   }
-  if (uniqueCombinationsEl) {
-    const combos = new Set(bets.map(b => `${(b.voittaja||'').toLowerCase()}|${String(b.pituus||'').toLowerCase()}`));
-    uniqueCombinationsEl.textContent = combos.size;
-  }
   
   // Update active players count
-  const activePlayersEl = document.getElementById('activePlayers');
   if (activePlayersEl) {
     const uniquePlayers = new Set(bets.map(b => b.veikkaaja));
     activePlayersEl.textContent = uniquePlayers.size;
   }
+  
+  // Update average bet
+  if (averageBetEl) {
+    const totalAmount = bets.reduce((s, b) => s + (Number(b.amount) || 0), 0);
+    const avgBet = bets.length > 0 ? totalAmount / bets.length : 0;
+    averageBetEl.textContent = formatCurrency(avgBet);
+  }
 
   // Update breakdowns
-  const byCompetitor = {};
-  const byLength = {};
+  const byWinner = {};
+  const byPlayer = {};
+  
   bets.forEach(b => {
-    const comp = b.voittaja || '(tyhjä)';
-    const len = String(b.pituus || '');
-    byCompetitor[comp] = (byCompetitor[comp] || 0) + 1;
-    byLength[len] = (byLength[len] || 0) + 1;
+    const winner = b.voittaja || '(tyhjä)';
+    const player = b.veikkaaja || '(tuntematon)';
+    
+    // Count by winner and sum amounts
+    if (!byWinner[winner]) {
+      byWinner[winner] = { count: 0, amount: 0 };
+    }
+    byWinner[winner].count += 1;
+    byWinner[winner].amount += Number(b.amount) || 0;
+    
+    // Count by player and sum amounts
+    if (!byPlayer[player]) {
+      byPlayer[player] = { count: 0, amount: 0 };
+    }
+    byPlayer[player].count += 1;
+    byPlayer[player].amount += Number(b.amount) || 0;
   });
 
-  const compUl = document.getElementById('statsByCompetitor');
-  if (compUl) {
-    compUl.innerHTML = Object.keys(byCompetitor)
-      .sort((a,b)=>a.localeCompare(b,'fi'))
-      .map(name => `<li><span>${name}</span><strong>${byCompetitor[name]}</strong></li>`)
+  // Update winner chart
+  updateWinnerChart(byWinner);
+  
+  // Update winner stats list
+  const winnerUl = document.getElementById('statsByWinner');
+  if (winnerUl) {
+    winnerUl.innerHTML = Object.keys(byWinner)
+      .sort((a,b) => byWinner[b].amount - byWinner[a].amount) // Sort by amount desc
+      .map(name => `<li><span>${name}</span><strong>${formatCurrency(byWinner[name].amount)} (${byWinner[name].count} vetoa)</strong></li>`)
       .join('') || '<li>-</li>';
   }
   
-  // Update length chart
-  updateLengthChart(byLength);
-  
-  const lenUl = document.getElementById('statsByLength');
-  if (lenUl) {
-    lenUl.innerHTML = Object.keys(byLength)
-      .sort((a,b)=>Number(a)-Number(b))
-      .map(k => `<li><span>${k} cm</span><strong>${byLength[k]}</strong></li>`)
+  // Update player stats list
+  const playerUl = document.getElementById('statsByPlayer');
+  if (playerUl) {
+    playerUl.innerHTML = Object.keys(byPlayer)
+      .sort((a,b) => byPlayer[b].amount - byPlayer[a].amount) // Sort by amount desc
+      .map(name => `<li><span>${name}</span><strong>${formatCurrency(byPlayer[name].amount)} (${byPlayer[name].count} vetoa)</strong></li>`)
       .join('') || '<li>-</li>';
   }
   
-  // Update connection status
-  const statusEl = document.getElementById('connectionStatus');
-  if (statusEl) {
-    statusEl.textContent = firebaseUtils ? 'Yhdistetty' : 'Offline';
-  }
+  // Update top 3 largest bets
+  updateTopBets();
 }
 
-function updateLengthChart(byLength) {
-  const chartEl = document.getElementById('lengthChart');
-  if (!chartEl || !Object.keys(byLength).length) {
+function updateWinnerChart(byWinner) {
+  const chartEl = document.getElementById('winnerChart');
+  if (!chartEl || !Object.keys(byWinner).length) {
     if (chartEl) chartEl.innerHTML = '<div class="no-data">Ei dataa näytettäväksi</div>';
     return;
   }
 
-  // Sort lengths numerically and get max count for scaling
-  const sortedLengths = Object.keys(byLength).sort((a, b) => Number(a) - Number(b));
-  const maxCount = Math.max(...Object.values(byLength));
+  // Sort winners by amount and get max amount for scaling
+  const sortedWinners = Object.keys(byWinner).sort((a, b) => byWinner[b].amount - byWinner[a].amount);
+  const maxAmount = Math.max(...Object.values(byWinner).map(w => w.amount));
   
   // Create bar chart
   let chartHTML = '<div class="chart-container">';
   
-  sortedLengths.forEach(length => {
-    const count = byLength[length];
-    const percentage = maxCount > 0 ? (count / maxCount) * 100 : 0;
+  // Use different colors for each winner
+  const colors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', '#ffeaa7', '#dda0dd'];
+  
+  sortedWinners.forEach((winner, index) => {
+    const data = byWinner[winner];
+    const percentage = maxAmount > 0 ? (data.amount / maxAmount) * 100 : 0;
     const barHeight = Math.max(percentage, 5); // Minimum 5% height for visibility
     
-    // Use single color for all bars
-    const barColor = '#4ecdc4'; // Teal color
+    const barColor = colors[index % colors.length];
     
     chartHTML += `
       <div class="chart-bar-container">
         <div class="chart-bar" style="height: ${barHeight}%; background-color: ${barColor};" 
-             title="${length}cm: ${count} vetoa">
-          <div class="bar-value">${count}</div>
+             title="${winner}: ${formatCurrency(data.amount)} (${data.count} vetoa)">
+          <div class="bar-value">${formatCurrency(data.amount)}</div>
         </div>
-        <div class="bar-label">${length}cm</div>
+        <div class="bar-label">${winner}</div>
       </div>
     `;
   });
   
   chartHTML += '</div>';
   
-  // No legend - removed completely
-  
   chartEl.innerHTML = chartHTML;
+}
+
+function updateTopBets() {
+  const topBetsEl = document.getElementById('topBets');
+  if (!topBetsEl) return;
+  
+  if (!bets.length) {
+    topBetsEl.innerHTML = '<li>Ei vetoja</li>';
+    return;
+  }
+  
+  // Sort bets by amount (descending) and take top 3
+  const sortedBets = [...bets].sort((a, b) => (Number(b.amount) || 0) - (Number(a.amount) || 0));
+  const top3 = sortedBets.slice(0, 3);
+  
+  topBetsEl.innerHTML = top3.map((bet, index) => {
+    return `<li><span>Veikkaaja: ${bet.veikkaaja} → ${bet.voittaja}</span><strong>${formatCurrency(bet.amount)}</strong></li>`;
+  }).join('');
 }
 
 function renderBets() {
@@ -500,7 +495,6 @@ function renderBets() {
           </div>
           <div>
             <div><strong>Voittaja:</strong> ${bet.voittaja}</div>
-            <div><strong>Pituus:</strong> ${bet.pituus} cm</div>
             <div class="bet-timestamp">${formatDate(bet.placedAt)}</div>
           </div>
         </div>`;
@@ -520,28 +514,16 @@ function initBettingEventListeners() {
       
       const veikkaaja = document.getElementById('veikkaaja').value.trim();
       const voittaja = document.getElementById('voittaja').value; // No trim needed for dropdown
-      const pituusRaw = document.getElementById('pituus').value.trim();
       const amount = parseFloat(document.getElementById('betAmount').value);
 
       // Enhanced validation
-      if (!/^\d+$/.test(pituusRaw)) {
-        showMessage('ERROR: Pituus (cm) on kokonaisluku väliltä 1-130.', true);
-        return;
-      }
-      const pituus = parseInt(pituusRaw, 10);
-
-      if (pituus < 1 || pituus > 130) {
-        showMessage('ERROR: Pituus on oltava väliltä 1-130 cm.', true);
-        return;
-      }
-
-      if (!veikkaaja || !voittaja || !pituusRaw || !amount) {
+      if (!veikkaaja || !voittaja || !amount) {
         showMessage('ERROR: Täytä kaikki kentät.', true);
         return;
       }
       
-      if (amount < 1 || amount > 10 || !Number.isInteger(amount)) {
-        showMessage('ERROR: Summa on oltava kokonaisluku väliltä 1-10 €.', true);
+      if (amount < 1 || amount > 200 || !Number.isInteger(amount)) {
+        showMessage('ERROR: Summa on oltava kokonaisluku väliltä 1-200 €.', true);
         return;
       }
 
@@ -550,11 +532,10 @@ function initBettingEventListeners() {
       saveFormValue('lastWinner', voittaja);
 
       // Calculate odds and create bet object
-      const odds = calculateOdds(voittaja, String(pituus), amount);
+      const odds = calculateOdds(voittaja, amount);
       const newBet = {
         veikkaaja, 
         voittaja, 
-        pituus: String(pituus),
         amount, 
         odds,
         placedAt: new Date().toISOString()
@@ -575,7 +556,7 @@ function initBettingEventListeners() {
         
         // Update odds display
         updateOddsDisplay();
-        showMessage(`Veto tallennettu! Kerroin: ${odds.toFixed(2)}, Mahdollinen voitto: ${formatCurrency(amount * odds)} 🔥`);
+        showMessage(`Veto tallennettu! Kerroin: ${odds.toFixed(2)}, Mahdollinen voitto: ${formatCurrency(amount * odds)}`);
         
         // Note: renderBets() will be called automatically by the real-time listener
         
@@ -585,7 +566,7 @@ function initBettingEventListeners() {
     });
 
     // Live updates - updated to handle dropdown
-    ['voittaja','pituus','betAmount'].forEach(id => {
+    ['voittaja','betAmount'].forEach(id => {
       const el = document.getElementById(id);
       if (el) {
         if (el.tagName === 'SELECT') {

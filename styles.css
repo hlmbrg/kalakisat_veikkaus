@@ -132,11 +132,11 @@ textarea { min-height: 160px; }
 }
 
 /* Window positions and sizes */
-#window-betting { top: 50px; left: 150px;  width: 500px; height: 500px; }
-#window-bets    { top: 50px; left: 700px; width: 400px; height: 600px; }
+#window-betting { top: 50px; left: 150px;  width: 500px; height: 350px; }
+#window-bets    { top: 50px; left: 700px; width: 450px; height: 650px; }
 #window-stats   { top: 130px; left: 200px; width: 1500px; height: 1000px; display: none; }
-#window-rules   { top: 170px; left: 400px; width: 600px; height: 750px; }
-#window-mycomputer { top: 160px; left: 380px; width: 600px; height: 440px; display: none; }
+#window-rules   { top: 170px; left: 400px; width: 600px; height: 600px; display: none; }
+#window-mycomputer { top: 160px; left: 380px; width: 600px; height: 240px; display: none; }
 #window-recycle { top: 180px; left: 420px; width: 520px; height: 420px; display: none; }
 
 /* Panels & Lists */
