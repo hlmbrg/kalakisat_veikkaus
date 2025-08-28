@@ -411,10 +411,162 @@ textarea { min-height: 160px; }
   border-color: #f5c6cb;
 }
 
-/* ================== Responsive ================== */
-@media (max-width: 900px) {
-  body { overflow:auto; }
-  .desktop { height:auto; min-height:100vh; padding-bottom:40px; }
-  .app-window { position: relative !important; width: 100% !important; left: 0 !important; top: 0 !important; height: auto !important; resize: none; margin: 10px 0; }
-  .desktop-icon { position: relative; display: inline-flex; margin: 6px; }
+/* ================== Mobile Responsive ================== */
+@media (max-width: 1050px) {
+  /* Force all individual windows to be full screen on mobile */
+  #window-betting,
+  #window-bets,
+  #window-stats,
+  #window-rules,
+  #window-mycomputer,
+  #window-recycle {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    resize: none !important;
+  }
+  body {
+    background: url('wallpaper.png') center/contain no-repeat;
+    background-size: contain;
+    background-attachment: scroll;
+    background-position: center center;
+    overflow: auto; 
+    font-size: 16px;
+    /* Create visual margins without distorting image */
+    background-origin: content-box;
+    padding: 20px; /* This creates the 20px border effect */
+  }
+  
+  #desktop { 
+    position: relative;
+    height: auto; 
+    min-height: calc(100vh - 90px); /* Account for body padding + taskbar */
+    padding: 15px 10px 10px 15px; /* Reduced since body has padding now */
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+.taskbar {
+  height: 40px;
+  padding: 0 6px;
+  display: flex; /* Ensure flex layout */
+  align-items: center;
+  gap: 4px;
+  overflow: hidden; /* Changed from overflow-x: auto */
+  flex-wrap: nowrap;
+}
+
+.start-button {
+  height: 28px;
+  width: 50px;
+  min-width: 36px;
+  padding: 0;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0; /* Hide text */
+  text-indent: -9999px;
+}
+
+.start-button .start-icon {
+  width: 20px;
+  height: 20px;
+}
+
+.taskbar-buttons {
+  flex: 1; /* Take remaining space */
+  display: flex;
+  gap: 2px;
+  overflow-x: auto; /* Only taskbar-buttons can scroll */
+  overflow-y: hidden;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE */
+}
+
+.taskbar-buttons::-webkit-scrollbar {
+  display: none; /* Chrome/Safari */
+}
+
+.taskbar-button {
+  height: 28px;
+  width: 50px;
+  min-width: 36px;
+  max-width: 50px;
+  padding: 0;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.taskbar-button .tb-icon { 
+  width: 20px;
+  height: 20px; 
+  image-rendering: pixelated; 
+}
+
+/* Hide text in taskbar buttons */
+.taskbar-button span {
+  display: none;
+}
+
+.taskbar-time {
+  font-size: 14px;
+  padding: 2px 8px;
+  flex-shrink: 0;
+  white-space: nowrap; /* Prevent time from wrapping */
+}
+  
+  /* Mobile messages */
+  .message {
+    position: fixed;
+    top: 60px;
+    left: 10px;
+    right: 10px;
+    z-index: 9999;
+    font-size: 16px;
+  }
+  
+  /* Mobile notepad */
+  .notepad-content {
+    font-size: 16px;
+    line-height: 1.4;
+  }
+  
+  /* Mobile computer content */
+  .computer-content {
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 20px;
+    padding: 20px;
+  }
+  
+  .drive-icon {
+    padding: 15px;
+  }
+}
+
+/* Extra small screens */
+@media (max-width: 320px) {
+  body { font-size: 14px; }
+  
+  .desktop-icon { 
+    width: 70px;
+    height: 90px;
+  }
+  .desktop-icon span { font-size: 12px; }
+  
+  .field-row input,
+  .field-row select {
+    font-size: 16px; /* Keep at 16px to prevent zoom */
+  }
+  
+  .taskbar { height: 36px; }
+  .start-button { height: 28px; font-size: 12px; }
+  .taskbar-button { height: 28px; font-size: 12px; min-width: 100px; }
 }

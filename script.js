@@ -1,5 +1,3 @@
-// ================= Windows 98 Desktop System =================
-
 // Desktop state
 let activeWindow = 'window-betting';
 let isDragging = false;
@@ -81,6 +79,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
   
   updateTaskbar();
+  initMobileEnhancements();
 });
 
 // ================= Desktop System Initialization =================
@@ -422,4 +421,193 @@ function loadRules() {
       el.textContent = 'Sääntöjen lataaminen epäonnistui.'; 
       console.error(err); 
     });
+}
+
+
+// ================= Mobile Detection & Handling =================
+function isMobile() {
+  return window.innerWidth <= 900;
+}
+
+// Mobile-specific window management
+function activateWindowMobile(windowId) {
+  if (!isMobile()) {
+    activateWindow(windowId);
+    return;
+  }
+  
+  const win = document.getElementById(windowId);
+  if (!win) {
+    console.error(`Window ${windowId} not found`);
+    return;
+  }
+
+  // On mobile, hide all other windows completely
+  document.querySelectorAll('.app-window').forEach(w => {
+    if (w.id !== windowId) {
+      w.style.display = 'none';
+      w.classList.remove('active');
+      w.classList.add('inactive');
+    }
+  });
+
+  // Show and activate the target window
+  win.style.display = 'block';
+  win.dataset.wasOpened = 'true';
+  win.classList.add('active');
+  win.classList.remove('inactive');
+  win.style.zIndex = ++currentZIndex;
+  activeWindow = windowId;
+
+  // Special handling for stats window
+  if (windowId === 'window-stats' && window.bettingSystem) {
+    window.bettingSystem.updateStats();
+  }
+
+  // Load rules if needed
+  if (windowId === 'window-rules') {
+    loadRules();
+  }
+
+  updateTaskbar();
+  console.log(`Activated mobile window: ${windowId}`);
+}
+
+
+// Touch event handling for desktop icons
+function addMobileIconHandling() {
+  if (!isMobile()) return;
+  
+  document.querySelectorAll('.desktop-icon').forEach(icon => {
+    // Remove existing double-click handler and add touch handler
+    const newIcon = icon.cloneNode(true);
+    icon.parentNode.replaceChild(newIcon, icon);
+    
+    let touchTimeout;
+    
+    newIcon.addEventListener('touchstart', (e) => {
+      e.preventDefault();
+      
+      // Clear any existing timeout
+      if (touchTimeout) {
+        clearTimeout(touchTimeout);
+        touchTimeout = null;
+        
+        // Double tap detected - open window
+        const app = newIcon.dataset.app;
+        const targetId = app === 'mycomputer' ? 'window-mycomputer'
+                       : app === 'betting'    ? 'window-betting'
+                       : app === 'betsdata'   ? 'window-bets'
+                       : app === 'stats'      ? 'window-stats'
+                       : app === 'rules'      ? 'window-rules'
+                       : app === 'recyclebin' ? 'window-recycle'
+                       : null;
+        
+        if (targetId) {
+          openWindowMobile(targetId);
+        }
+      } else {
+        // First tap - select icon
+        document.querySelectorAll('.desktop-icon').forEach(i => i.classList.remove('selected'));
+        newIcon.classList.add('selected');
+        
+        // Set timeout for double tap detection
+        touchTimeout = setTimeout(() => {
+          touchTimeout = null;
+        }, 300);
+      }
+    });
+    
+    // Also handle single tap for selection
+    newIcon.addEventListener('click', (e) => {
+      if (isMobile()) {
+        e.preventDefault();
+        return;
+      }
+    });
+  });
+}
+
+// Mobile window opening
+function openWindowMobile(windowId) {
+  if (!isMobile()) {
+    openWindow(windowId);
+    return;
+  }
+  
+  const win = document.getElementById(windowId);
+  if (!win) {
+    console.error(`Window ${windowId} not found`);
+    return;
+  }
+  
+  // Hide all other windows
+  document.querySelectorAll('.app-window').forEach(w => {
+    if (w.id !== windowId) {
+      w.style.display = 'none';
+    }
+  });
+  
+  // Show and setup the target window
+  win.style.display = 'block';
+  win.dataset.wasOpened = 'true';
+  
+  // Special handling for rules window
+  if (windowId === 'window-rules') {
+    loadRules();
+  }
+  
+  activateWindowMobile(windowId);
+}
+
+// Prevent zoom on double tap
+function preventZoomOnDoubleTap() {
+  let lastTouchEnd = 0;
+  document.addEventListener('touchend', (e) => {
+    const now = (new Date()).getTime();
+    if (now - lastTouchEnd <= 300) {
+      e.preventDefault();
+    }
+    lastTouchEnd = now;
+  }, false);
+}
+
+// Mobile orientation change handler
+function handleOrientationChange() {
+  if (!isMobile()) return;
+  
+  // Refresh layout after orientation change
+  setTimeout(() => {
+    updateTaskbar();
+    if (window.bettingSystem) {
+      window.bettingSystem.updateOddsDisplay();
+      window.bettingSystem.updateStats();
+    }
+  }, 100);
+}
+
+// Initialize mobile enhancements
+function initMobileEnhancements() {
+  if (!isMobile()) return;
+  
+  console.log('Initializing mobile enhancements');
+  
+  // Add mobile-specific handlers
+  addMobileIconHandling();
+  preventZoomOnDoubleTap();
+  
+  // Override window management functions for mobile
+  window.activateWindow = activateWindowMobile;
+  window.openWindow = openWindowMobile;
+  
+  // Handle orientation changes
+  window.addEventListener('orientationchange', handleOrientationChange);
+  window.addEventListener('resize', () => {
+    setTimeout(handleOrientationChange, 100);
+  });
+  
+  // Ensure proper initial state
+  setTimeout(() => {
+    updateTaskbar();
+  }, 500);
 }
