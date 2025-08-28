@@ -80,9 +80,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   
   updateTaskbar();
   initMobileEnhancements();
+  initFileExplorer();
 });
 
-// ================= Desktop System Initialization =================
+// ================= Window Click-to-Front =================
 function initDesktopSystem() {
   initWindowDragging();
   initDesktopIcons();
@@ -473,13 +474,11 @@ function activateWindowMobile(windowId) {
   console.log(`Activated mobile window: ${windowId}`);
 }
 
-
-// Touch event handling for desktop icons
+// Icon handling for mobile
 function addMobileIconHandling() {
   if (!isMobile()) return;
   
   document.querySelectorAll('.desktop-icon').forEach(icon => {
-    // Remove existing double-click handler and add touch handler
     const newIcon = icon.cloneNode(true);
     icon.parentNode.replaceChild(newIcon, icon);
     
@@ -488,41 +487,36 @@ function addMobileIconHandling() {
     newIcon.addEventListener('touchstart', (e) => {
       e.preventDefault();
       
-      // Clear any existing timeout
       if (touchTimeout) {
         clearTimeout(touchTimeout);
         touchTimeout = null;
         
         // Double tap detected - open window
         const app = newIcon.dataset.app;
-        const targetId = app === 'mycomputer' ? 'window-mycomputer'
-                       : app === 'betting'    ? 'window-betting'
-                       : app === 'betsdata'   ? 'window-bets'
-                       : app === 'stats'      ? 'window-stats'
-                       : app === 'rules'      ? 'window-rules'
-                       : app === 'recyclebin' ? 'window-recycle'
-                       : null;
         
-        if (targetId) {
-          openWindowMobile(targetId);
+        if (app === 'mycomputer') {
+          openUnifiedExplorer('Oma tietokone');
+        } else if (app === 'recyclebin') {
+          openUnifiedExplorer('Roskakori');
+        } else {
+          const targetId = app === 'betting' ? 'window-betting'
+                         : app === 'betsdata' ? 'window-bets'
+                         : app === 'stats' ? 'window-stats'
+                         : app === 'rules' ? 'window-rules'
+                         : null;
+          
+          if (targetId) {
+            openWindowMobile(targetId);
+          }
         }
       } else {
         // First tap - select icon
         document.querySelectorAll('.desktop-icon').forEach(i => i.classList.remove('selected'));
         newIcon.classList.add('selected');
         
-        // Set timeout for double tap detection
         touchTimeout = setTimeout(() => {
           touchTimeout = null;
         }, 300);
-      }
-    });
-    
-    // Also handle single tap for selection
-    newIcon.addEventListener('click', (e) => {
-      if (isMobile()) {
-        e.preventDefault();
-        return;
       }
     });
   });
@@ -610,4 +604,347 @@ function initMobileEnhancements() {
   setTimeout(() => {
     updateTaskbar();
   }, 500);
+}
+
+
+// ================= Simplified File Explorer System =================
+const driveContents = {
+  'Oma tietokone': {
+    folders: [],
+    files: [],
+    drives: [
+      { name: 'Kiintolevy (C:)', path: 'C:', icon: 'hard-drive' },
+      { name: 'Tissikuvat (D:)', path: 'D:', icon: 'hard-drive' },
+      { name: 'Kalakuvat (E:)', path: 'E:', icon: 'hard-drive' }
+    ]
+  },
+  'Roskakori': {
+    folders: ['Deleted Folders'],
+    files: ['deleted_document.txt', 'old_photo.jpg', 'unused_file.doc', 'temp_data.tmp']
+  },
+  'C:': {
+    folders: ['Acrobat3', 'Documents', 'Compaq', 'My Documents', 'My Music', 'Program Files', 'Windows'],
+    files: ['autoexec.bat', 'config.sys', 'bootlog.txt']
+  },
+  'D:': {
+    folders: ['Tissikuvat', 'Backup', 'Games'],
+    files: ['readme.txt']
+  },
+  'E:': {
+    folders: ['Kalakuvat', 'Tournament Results', 'Equipment'],
+    files: ['fish001.jpg', 'fish002.jpg', 'big_catch.png', 'lake_sunset.jpg', 'fishing_trip.bmp']
+  }
+};
+
+// Folder contents (what's inside each folder)
+const folderContents = {
+  'Tissikuvat': {
+    folders: ['2024', '2023', 'Favorites'],
+    files: ['pic001.jpg', 'pic002.png', 'selfie.jpg', 'vacation.bmp', 'party.gif']
+  },
+  'Kalakuvat': {
+    folders: ['Summer 2024', 'Winter 2023', 'Best Catches'],
+    files: ['pike_45cm.jpg', 'perch_collection.png', 'morning_fishing.jpg', 'boat_sunset.bmp', 'tackle_box.jpg']
+  },
+  'My Documents': {
+    folders: ['Work', 'Personal', 'Photos'],
+    files: ['resume.doc', 'notes.txt', 'budget.xls']
+  },
+  'My Music': {
+    folders: ['Rock', 'Pop', 'Classical'],
+    files: ['favorite_song.mp3', 'playlist.m3u']
+  },
+  'Documents': {
+    folders: ['Letters', 'Reports'],
+    files: ['letter.doc', 'memo.txt', 'presentation.ppt']
+  },
+  'Deleted Folders': {
+    folders: [],
+    files: ['deleted_photos.zip', 'old_project.folder']
+  }
+};
+
+let currentPath = 'Oma tietokone';
+let navigationHistory = [];
+let selectedFile = null;
+
+
+function initFileExplorer() {
+  // Add double-click handlers to desktop icons
+  document.querySelectorAll('.desktop-icon').forEach(icon => {
+    // Remove existing handlers and add unified one
+    const newIcon = icon.cloneNode(true);
+    icon.parentNode.replaceChild(newIcon, icon);
+    
+    newIcon.addEventListener('dblclick', () => {
+      const app = newIcon.dataset.app;
+      
+      if (app === 'mycomputer') {
+        openUnifiedExplorer('Oma tietokone');
+      } else if (app === 'recyclebin') {
+        openUnifiedExplorer('Roskakori');
+      } else {
+        // Handle other apps normally
+        const targetId = app === 'betting'    ? 'window-betting'
+                       : app === 'betsdata'   ? 'window-bets'
+                       : app === 'stats'      ? 'window-stats'
+                       : app === 'rules'      ? 'window-rules'
+                       : null;
+        
+        if (targetId) {
+          openWindow(targetId);
+        }
+      }
+    });
+    
+    // Handle selection
+    newIcon.addEventListener('click', () => {
+      document.querySelectorAll('.desktop-icon').forEach(i => i.classList.remove('selected'));
+      newIcon.classList.add('selected');
+    });
+  });
+  
+  // Add click handlers for file/folder selection in explorer
+  document.addEventListener('click', (e) => {
+    if (e.target.closest('.explorer-content')) {
+      const fileItem = e.target.closest('.file-item');
+      if (fileItem) {
+        selectFile(fileItem);
+      } else {
+        clearFileSelection();
+      }
+    }
+  });
+  
+  // Add double-click handler for folders and files
+  document.addEventListener('dblclick', (e) => {
+    const fileItem = e.target.closest('.file-item');
+    if (fileItem) {
+      const fileName = fileItem.querySelector('.file-name').textContent;
+      const fileIcon = fileItem.querySelector('.file-icon');
+      
+      if (fileIcon.classList.contains('folder')) {
+        openFolder(fileName);
+      } else if (fileIcon.classList.contains('drive')) {
+        // Extract drive path from the name
+        const drivePath = fileName.match(/\(([^)]+)\)/);
+        if (drivePath) {
+          openFolder(drivePath[1]);
+        }
+      } else {
+        openFile(fileName);
+      }
+    }
+  });
+}
+
+function openUnifiedExplorer(location) {
+  currentPath = location;
+  navigationHistory = [];
+  
+  updateExplorerUI();
+  populateExplorer();
+  openWindow('window-explorer');
+}
+
+function updateExplorerUI() {
+  // Update window title
+  const titleBar = document.querySelector('#window-explorer .title-bar-text');
+  if (titleBar) {
+    titleBar.textContent = currentPath;
+  }
+  
+  // Update address bar with proper path formatting
+  const addressInput = document.getElementById('addressBar');
+  if (addressInput) {
+    let displayPath = currentPath;
+    
+    // Format different path types
+    if (currentPath === 'My Computer') {
+      displayPath = 'My Computer';
+    } else if (currentPath === 'Recycle Bin') {
+      displayPath = 'Recycle Bin';
+    } else if (currentPath.match(/^[A-Z]:$/)) {
+      // Root drive like "C:" becomes "C:\"
+      displayPath = currentPath + '\\';
+    } else if (currentPath.includes(':')) {
+      // Already contains drive, check if it needs proper formatting
+      if (!currentPath.includes('\\')) {
+        displayPath = currentPath + '\\';
+      }
+    } else {
+      // Folder inside a drive, need to reconstruct full path
+      if (navigationHistory.length > 0) {
+        const parentPath = navigationHistory[navigationHistory.length - 1];
+        if (parentPath.match(/^[A-Z]:$/)) {
+          displayPath = parentPath + '\\' + currentPath;
+        } else {
+          displayPath = parentPath + '\\' + currentPath;
+        }
+      }
+    }
+    
+    addressInput.value = displayPath;
+  }
+  
+  // Update back button state
+  const backBtn = document.getElementById('backBtn');
+  if (backBtn) {
+    backBtn.disabled = navigationHistory.length === 0;
+  }
+}
+
+function populateExplorer() {
+  const content = document.getElementById('explorerContent');
+  if (!content) return;
+  
+  content.innerHTML = '';
+  
+  let folders = [];
+  let files = [];
+  let drives = [];
+  
+  // Determine what to show based on current path
+  if (driveContents[currentPath]) {
+    const data = driveContents[currentPath];
+    folders = data.folders || [];
+    files = data.files || [];
+    drives = data.drives || [];
+  } else {
+    // Check if it's inside a folder
+    const folderData = folderContents[currentPath];
+    if (folderData) {
+      folders = folderData.folders || [];
+      files = folderData.files || [];
+    }
+  }
+  
+  // Add drives first (for My Computer)
+  drives.forEach(drive => {
+    const fileItem = document.createElement('div');
+    fileItem.className = 'file-item';
+    fileItem.innerHTML = `
+      <div class="file-icon drive"></div>
+      <div class="file-name">${drive.name}</div>
+    `;
+    content.appendChild(fileItem);
+  });
+  
+  // Add folders
+  folders.forEach(folderName => {
+    const fileItem = document.createElement('div');
+    fileItem.className = 'file-item';
+    fileItem.innerHTML = `
+      <div class="file-icon folder"></div>
+      <div class="file-name">${folderName}</div>
+    `;
+    content.appendChild(fileItem);
+  });
+  
+  // Add files
+  files.forEach(fileName => {
+    const fileItem = document.createElement('div');
+    fileItem.className = 'file-item';
+    
+    // Determine file type
+    const isImage = /\.(jpg|jpeg|png|gif|bmp)$/i.test(fileName);
+    const iconClass = isImage ? 'image' : 'file';
+    
+    fileItem.innerHTML = `
+      <div class="file-icon ${iconClass}"></div>
+      <div class="file-name">${fileName}</div>
+    `;
+    content.appendChild(fileItem);
+  });
+}
+
+function openFolder(folderName) {
+  // Save current path to history
+  navigationHistory.push(currentPath);
+  
+  // Navigate to folder/drive
+  currentPath = folderName;
+  
+  updateExplorerUI();
+  populateExplorer();
+}
+
+function openFile(fileName) {
+  const isImage = /\.(jpg|jpeg|png|gif|bmp)$/i.test(fileName);
+  const isDeleted = currentPath === 'Recycle Bin' || navigationHistory.includes('Recycle Bin');
+  
+  const message = document.createElement('div');
+  message.style.cssText = `
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: #c0c0c0;
+    border: 2px outset #c0c0c0;
+    padding: 20px;
+    z-index: 10000;
+    font-size: 14px;
+    text-align: center;
+    min-width: 250px;
+  `;
+  
+  let messageText;
+  if (isDeleted) {
+    messageText = `Deleted file: ${fileName}<br><small>File is in Recycle Bin</small>`;
+  } else if (isImage) {
+    messageText = `Opening image: ${fileName}<br><small>Image viewer would open here</small>`;
+  } else {
+    messageText = `Opening file: ${fileName}<br><small>Associated program would open here</small>`;
+  }
+  
+  message.innerHTML = `
+    <div>${messageText}</div>
+    <div style="margin-top: 15px;">
+      <button onclick="this.parentElement.parentElement.remove()" 
+              style="padding: 6px 16px;">OK</button>
+    </div>
+  `;
+  
+  document.body.appendChild(message);
+  
+  setTimeout(() => {
+    if (message.parentElement) {
+      message.remove();
+    }
+  }, 4000);
+}
+
+function goBack() {
+  if (navigationHistory.length > 0) {
+    currentPath = navigationHistory.pop();
+    updateExplorerUI();
+    populateExplorer();
+  }
+}
+
+function selectFile(fileItem) {
+  clearFileSelection();
+  fileItem.classList.add('selected');
+  selectedFile = fileItem;
+}
+
+function clearFileSelection() {
+  document.querySelectorAll('.file-item.selected').forEach(item => {
+    item.classList.remove('selected');
+  });
+  selectedFile = null;
+}
+
+// Update taskbar icon mapping
+function taskbarIconForWindow(id) {
+  switch (id) {
+    case 'window-mycomputer': return 'icons/my-computer.png';
+    case 'window-betting':    return 'icons/betting.png';
+    case 'window-bets':       return 'icons/bets.png';
+    case 'window-stats':      return 'icons/chart.png';
+    case 'window-rules':      return 'icons/txt-file.png';
+    case 'window-recycle':    return 'icons/recycle-bin.png';
+    case 'window-explorer':   return 'icons/folder.png';
+    default: return 'icons/windows.png';
+  }
 }

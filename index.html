@@ -44,6 +44,33 @@
     </div>
   </div>
 
+  <!-- File Explorer Window -->
+  <div id="window-explorer" class="window app-window">
+    <div class="title-bar">
+      <div class="title-bar-text">Drive_c (C:)</div>
+      <div class="title-bar-controls">
+        <button aria-label="Minimize" onclick="minimizeWindow('window-explorer')"></button>
+        <button aria-label="Maximize" onclick="maximizeWindow('window-explorer')"></button>
+        <button aria-label="Close" onclick="closeWindow('window-explorer')"></button>
+      </div>
+    </div>
+    <div class="window-body">
+      <!-- Address Bar with integrated back button -->
+      <div class="explorer-address">
+        <button class="explorer-btn" id="backBtn" onclick="goBack()">
+          <img src="icons/back.png" alt="Back">
+        </button>
+        <input type="text" id="addressBar" value="C:\" readonly>
+      </div>
+      
+      <!-- File Area -->
+      <div class="explorer-content" id="explorerContent">
+        <!-- Folders and files will be populated by JavaScript -->
+      </div>
+    </div>
+  </div>
+
+
   <!-- Betting Window -->
   <div id="window-betting" class="window app-window active">
     <div class="title-bar">
@@ -166,33 +193,6 @@
     <div class="taskbar-time"><span id="currentTime">--:--:--</span></div>
   </div>
 
-  <!-- My Computer Window -->
-  <div id="window-mycomputer" class="window app-window">
-    <div class="title-bar">
-      <div class="title-bar-text">Oma tietokone</div>
-      <div class="title-bar-controls">
-        <button aria-label="Minimize" onclick="minimizeWindow('window-mycomputer')"></button>
-        <button aria-label="Maximize" onclick="maximizeWindow('window-mycomputer')"></button>
-        <button aria-label="Close" onclick="closeWindow('window-mycomputer')"></button>
-      </div>
-    </div>
-    <div class="window-body">
-      <div class="computer-content">
-        <div class="drive-icon">
-          <div class="drive-image"></div>
-          <div class="drive-label">Kiintolevy (C:)</div>
-        </div>
-        <div class="drive-icon">
-          <div class="drive-image"></div>
-          <div class="drive-label">Tissikuvat (D:)</div>
-        </div>
-        <div class="drive-icon">
-          <div class="drive-image"></div>
-          <div class="drive-label">Kalakuvat (E:)</div>
-        </div>
-      </div>
-    </div>
-  </div>
 
   <!-- Rules Window -->
   <div id="window-rules" class="window app-window">
@@ -209,23 +209,6 @@
     </div>
   </div>
 
-  <!-- Recycle Bin Window -->
-  <div id="window-recycle" class="window app-window">
-    <div class="title-bar">
-      <div class="title-bar-text">Roskakori</div>
-      <div class="title-bar-controls">
-        <button aria-label="Minimize" onclick="minimizeWindow('window-recycle')"></button>
-        <button aria-label="Maximize" onclick="maximizeWindow('window-recycle')"></button>
-        <button aria-label="Close" onclick="closeWindow('window-recycle')"></button>
-      </div>
-    </div>
-    <div class="window-body">
-      <div class="folder-empty">
-        <p>Roskakori on tyhjä.</p>
-        <p>Vedä tiedostoja tähän poistaaksesi ne.</p>
-      </div>
-    </div>
-  </div>
 
   <script src="firebase.js"></script>
   <script src="script.js"></script>
