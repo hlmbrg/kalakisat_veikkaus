@@ -606,8 +606,7 @@ function initMobileEnhancements() {
   }, 500);
 }
 
-
-// ================= Simplified File Explorer System =================
+// Folder structure
 const driveContents = {
   'Oma tietokone': {
     folders: [],
@@ -619,48 +618,60 @@ const driveContents = {
     ]
   },
   'Roskakori': {
-    folders: ['Deleted Folders'],
-    files: ['deleted_document.txt', 'old_photo.jpg', 'unused_file.doc', 'temp_data.tmp']
+    folders: [],
+    files: ['säännöt-2023.txt','säännöt-2024.txt','säännöt-2025.txt','porttikiellot-2023.txt','vp-mestari.png' ,'kalastusalue.png']
   },
   'C:': {
-    folders: ['Acrobat3', 'Documents', 'Compaq', 'My Documents', 'My Music', 'Program Files', 'Windows'],
-    files: ['autoexec.bat', 'config.sys', 'bootlog.txt']
+    folders: ['Windows'],
+    files: []
   },
   'D:': {
-    folders: ['Tissikuvat', 'Backup', 'Games'],
-    files: ['readme.txt']
+    folders: ['Tissikuvat', 'Varmuuskopiot'],
+    files: []
   },
   'E:': {
-    folders: ['Kalakuvat', 'Tournament Results', 'Equipment'],
-    files: ['fish001.jpg', 'fish002.jpg', 'big_catch.png', 'lake_sunset.jpg', 'fishing_trip.bmp']
+    folders: ['Kalakuvat', 'Kilpailutulokset'],
+    files: ['kala001.jpg', 'iso_saalis.png', 'jarvi_auringonlasku.jpg']
   }
 };
 
-// Folder contents (what's inside each folder)
+// Folder contents with Finnish names
 const folderContents = {
   'Tissikuvat': {
-    folders: ['2024', '2023', 'Favorites'],
-    files: ['pic001.jpg', 'pic002.png', 'selfie.jpg', 'vacation.bmp', 'party.gif']
+    folders: [],
+    files: ['sydney_sweeney.png','sydney_sweeney2.png', 'bonnie_blue.png']
   },
   'Kalakuvat': {
-    folders: ['Summer 2024', 'Winter 2023', 'Best Catches'],
-    files: ['pike_45cm.jpg', 'perch_collection.png', 'morning_fishing.jpg', 'boat_sunset.bmp', 'tackle_box.jpg']
+    folders: ['Kesä 2024', 'Parhaat saaliit'],
+    files: ['hauki_45cm.jpg', 'ahvenet.png', 'aamukala.jpg']
   },
-  'My Documents': {
-    folders: ['Work', 'Personal', 'Photos'],
-    files: ['resume.doc', 'notes.txt', 'budget.xls']
+  'Asiakirjat': {
+    folders: ['Työ', 'Henkilökohtainen'],
+    files: ['kirje.txt', 'muistio.txt', 'lista.txt']
   },
-  'My Music': {
-    folders: ['Rock', 'Pop', 'Classical'],
-    files: ['favorite_song.mp3', 'playlist.m3u']
+  'Kuvat': {
+    folders: ['Valokuvat'],
+    files: ['perhekuva.jpg', 'maisema.png']
   },
-  'Documents': {
-    folders: ['Letters', 'Reports'],
-    files: ['letter.doc', 'memo.txt', 'presentation.ppt']
-  },
-  'Deleted Folders': {
+  'Työ': {
     folders: [],
-    files: ['deleted_photos.zip', 'old_project.folder']
+    files: ['raportti.txt', 'kokous.txt']
+  },
+  'Henkilökohtainen': {
+    folders: [],
+    files: ['päiväkirja.txt', 'ostoslista.txt']
+  },
+  'Poistetut kansiot': {
+    folders: [],
+    files: []
+  },
+  'Kesä 2024': {
+    folders: [],
+    files: ['heinakuu_kala.jpg', 'elokuun_saalis.png']
+  },
+  'Parhaat saaliit': {
+    folders: [],
+    files: ['ennatys_hauki.jpg', 'iso_ahven.jpg']
   }
 };
 
@@ -841,14 +852,20 @@ function populateExplorer() {
     content.appendChild(fileItem);
   });
   
-  // Add files
   files.forEach(fileName => {
     const fileItem = document.createElement('div');
     fileItem.className = 'file-item';
     
-    // Determine file type
+    // Determine file type - only images and txt files
     const isImage = /\.(jpg|jpeg|png|gif|bmp)$/i.test(fileName);
-    const iconClass = isImage ? 'image' : 'file';
+    const isTxt = /\.txt$/i.test(fileName);
+    
+    let iconClass = 'file'; // default
+    if (isImage) {
+      iconClass = 'image';
+    } else if (isTxt) {
+      iconClass = 'txt';
+    }
     
     fileItem.innerHTML = `
       <div class="file-icon ${iconClass}"></div>
