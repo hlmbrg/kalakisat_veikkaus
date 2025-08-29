@@ -29,8 +29,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Configure which windows open at startup here:
   
   const startupWindows = [
-    'window-betting',    // Veikkaus window
-    'window-bets',       // Veikkaukset window  
+    // 'window-betting',    // Veikkaus window
+    // 'window-bets',       // Veikkaukset window  
     // 'window-stats',      // Tilastot window (commented out = closed)
     // 'window-mycomputer', // Oma tietokone (commented out = closed)
     // 'window-rules',      // Säännöt (commented out = closed)
@@ -474,52 +474,28 @@ function activateWindowMobile(windowId) {
   console.log(`Activated mobile window: ${windowId}`);
 }
 
-// Icon handling for mobile
-function addMobileIconHandling() {
-  if (!isMobile()) return;
-  
-  document.querySelectorAll('.desktop-icon').forEach(icon => {
-    const newIcon = icon.cloneNode(true);
-    icon.parentNode.replaceChild(newIcon, icon);
+
+// Shared function to handle icon opening
+function handleIconOpen(app) {
+  if (app === 'mycomputer') {
+    openUnifiedExplorer('Oma tietokone');
+  } else if (app === 'recyclebin') {
+    openUnifiedExplorer('Roskakori');
+  } else {
+    const targetId = app === 'betting' ? 'window-betting'
+                   : app === 'betsdata' ? 'window-bets'
+                   : app === 'stats' ? 'window-stats'
+                   : app === 'rules' ? 'window-rules'
+                   : null;
     
-    let touchTimeout;
-    
-    newIcon.addEventListener('touchstart', (e) => {
-      e.preventDefault();
-      
-      if (touchTimeout) {
-        clearTimeout(touchTimeout);
-        touchTimeout = null;
-        
-        // Double tap detected - open window
-        const app = newIcon.dataset.app;
-        
-        if (app === 'mycomputer') {
-          openUnifiedExplorer('Oma tietokone');
-        } else if (app === 'recyclebin') {
-          openUnifiedExplorer('Roskakori');
-        } else {
-          const targetId = app === 'betting' ? 'window-betting'
-                         : app === 'betsdata' ? 'window-bets'
-                         : app === 'stats' ? 'window-stats'
-                         : app === 'rules' ? 'window-rules'
-                         : null;
-          
-          if (targetId) {
-            openWindowMobile(targetId);
-          }
-        }
+    if (targetId) {
+      if (isMobile()) {
+        openWindowMobile(targetId);
       } else {
-        // First tap - select icon
-        document.querySelectorAll('.desktop-icon').forEach(i => i.classList.remove('selected'));
-        newIcon.classList.add('selected');
-        
-        touchTimeout = setTimeout(() => {
-          touchTimeout = null;
-        }, 300);
+        openWindow(targetId);
       }
-    });
-  });
+    }
+  }
 }
 
 // Mobile window opening
@@ -586,8 +562,7 @@ function initMobileEnhancements() {
   
   console.log('Initializing mobile enhancements');
   
-  // Add mobile-specific handlers
-  addMobileIconHandling();
+  // Remove this line: addMobileIconHandling();
   preventZoomOnDoubleTap();
   
   // Override window management functions for mobile
@@ -681,41 +656,52 @@ let selectedFile = null;
 
 
 function initFileExplorer() {
-  // Add double-click handlers to desktop icons
+  // Add handlers to desktop icons (mobile-aware)
   document.querySelectorAll('.desktop-icon').forEach(icon => {
     // Remove existing handlers and add unified one
     const newIcon = icon.cloneNode(true);
     icon.parentNode.replaceChild(newIcon, icon);
     
-    newIcon.addEventListener('dblclick', () => {
-      const app = newIcon.dataset.app;
+    if (isMobile()) {
+      // Mobile: touch events
+      let touchTimeout;
       
-      if (app === 'mycomputer') {
-        openUnifiedExplorer('Oma tietokone');
-      } else if (app === 'recyclebin') {
-        openUnifiedExplorer('Roskakori');
-      } else {
-        // Handle other apps normally
-        const targetId = app === 'betting'    ? 'window-betting'
-                       : app === 'betsdata'   ? 'window-bets'
-                       : app === 'stats'      ? 'window-stats'
-                       : app === 'rules'      ? 'window-rules'
-                       : null;
+      newIcon.addEventListener('touchstart', (e) => {
+        e.preventDefault();
         
-        if (targetId) {
-          openWindow(targetId);
+        if (touchTimeout) {
+          clearTimeout(touchTimeout);
+          touchTimeout = null;
+          
+          // Double tap detected - open window
+          const app = newIcon.dataset.app;
+          handleIconOpen(app);
+        } else {
+          // First tap - select icon
+          document.querySelectorAll('.desktop-icon').forEach(i => i.classList.remove('selected'));
+          newIcon.classList.add('selected');
+          
+          touchTimeout = setTimeout(() => {
+            touchTimeout = null;
+          }, 300);
         }
-      }
-    });
+      });
+    } else {
+      // Desktop: double-click events
+      newIcon.addEventListener('dblclick', () => {
+        const app = newIcon.dataset.app;
+        handleIconOpen(app);
+      });
+    }
     
-    // Handle selection
+    // Handle selection for both mobile and desktop
     newIcon.addEventListener('click', () => {
       document.querySelectorAll('.desktop-icon').forEach(i => i.classList.remove('selected'));
       newIcon.classList.add('selected');
     });
   });
-  
-  // Add click handlers for file/folder selection in explorer
+
+  // Rest of the function stays the same...
   document.addEventListener('click', (e) => {
     if (e.target.closest('.explorer-content')) {
       const fileItem = e.target.closest('.file-item');
@@ -727,7 +713,6 @@ function initFileExplorer() {
     }
   });
   
-  // Add double-click handler for folders and files
   document.addEventListener('dblclick', (e) => {
     const fileItem = e.target.closest('.file-item');
     if (fileItem) {
@@ -737,7 +722,6 @@ function initFileExplorer() {
       if (fileIcon.classList.contains('folder')) {
         openFolder(fileName);
       } else if (fileIcon.classList.contains('drive')) {
-        // Extract drive path from the name
         const drivePath = fileName.match(/\(([^)]+)\)/);
         if (drivePath) {
           openFolder(drivePath[1]);
@@ -747,6 +731,29 @@ function initFileExplorer() {
       }
     }
   });
+}
+
+// Add this helper function
+function handleIconOpen(app) {
+  if (app === 'mycomputer') {
+    openUnifiedExplorer('Oma tietokone');
+  } else if (app === 'recyclebin') {
+    openUnifiedExplorer('Roskakori');
+  } else {
+    const targetId = app === 'betting' ? 'window-betting'
+                   : app === 'betsdata' ? 'window-bets'
+                   : app === 'stats' ? 'window-stats'
+                   : app === 'rules' ? 'window-rules'
+                   : null;
+    
+    if (targetId) {
+      if (isMobile()) {
+        openWindowMobile(targetId);
+      } else {
+        openWindow(targetId);
+      }
+    }
+  }
 }
 
 function openUnifiedExplorer(location) {
@@ -961,7 +968,7 @@ function taskbarIconForWindow(id) {
     case 'window-stats':      return 'icons/chart.png';
     case 'window-rules':      return 'icons/txt-file.png';
     case 'window-recycle':    return 'icons/recycle-bin.png';
-    case 'window-explorer':   return 'icons/folder.png';
+    case 'window-explorer':   return 'icons/folder.png'; /* Make sure this line exists */
     default: return 'icons/windows.png';
   }
 }

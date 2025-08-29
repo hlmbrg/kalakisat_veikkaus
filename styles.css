@@ -1,22 +1,20 @@
-/* ================== Global baseline (ONE font + size everywhere) ================== */
+/* ================== Global baseline ================== */
 html, body {
   height: 100%;
   margin: 0;
   background: #008080;
   font-family: 'MS Sans Serif', Tahoma, Arial, sans-serif;
-  font-size: 15px;         /* global default size */
+  font-size: 15px;
   line-height: 1.25;
   overflow: hidden;
   user-select: none;
 }
 
-/* Wallpaper (root) */
 body {
   background: url('wallpaper.png') center/cover fixed no-repeat;
   background-size: 1200px 857px;
 }
 
-/* Inherit font + size across all elements (including 98.css components) */
 * {
   -webkit-font-smoothing: auto;
   -moz-osx-font-smoothing: auto;
@@ -27,13 +25,12 @@ body {
 /* Utilities */
 .font-small { font-size: 14px !important; }
 .font-large { font-size: 20px !important; }
-.font-mono  { font-family: 'MS Sans Serif', monospace !important; }
+.font-mono { font-family: 'MS Sans Serif', monospace !important; }
 
-/* Bigger controls */
+/* Form controls */
 button, input, select, textarea { min-height: 34px; }
 textarea { min-height: 160px; }
 
-/* Form field rows */
 .field-row {
   display: flex;
   align-items: center;
@@ -52,14 +49,13 @@ textarea { min-height: 160px; }
   min-width: 200px;
 }
 
-/* ================== Desktop ================== */
-/* Desktop layout */
+/* ================== Desktop Layout ================== */
 #desktop {
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
-  bottom: 40px; /* leaves space for taskbar */
+  bottom: 40px;
   padding: 20px;
   display: grid;
   grid-template-columns: repeat(auto-fill, 100px);
@@ -69,7 +65,7 @@ textarea { min-height: 160px; }
   justify-content: start;
 }
 
-/* Desktop icons (absolute positions, ordered top-to-bottom) */
+/* Desktop icons */
 .desktop-icon {
   position: absolute;
   width: 100px;
@@ -83,11 +79,11 @@ textarea { min-height: 160px; }
   border: 1px solid transparent;
   cursor: default;
 }
+
 .desktop-icon:hover { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.3); }
 .desktop-icon.selected { background: rgba(0,0,128,0.35); border: 1px dotted #fff; }
 .desktop-icon span { margin-top: 6px; text-align: center; }
 
-/* Icon image (as background via classes) */
 .icon-image {
   width: 48px;
   height: 48px;
@@ -97,21 +93,20 @@ textarea { min-height: 160px; }
   image-rendering: pixelated;
 }
 
-/* Map desktop icons to PNGs */
+/* Icon mappings */
 .icon-mycomputer .icon-image { background-image: url('icons/my-computer.png'); }
-.icon-betting    .icon-image { background-image: url('icons/betting.png'); }
-.icon-betsdata   .icon-image { background-image: url('icons/bets.png'); }
-.icon-stats      .icon-image { background-image: url('icons/chart.png'); }
-.icon-rules      .icon-image { background-image: url('icons/txt-file.png'); }
+.icon-betting .icon-image { background-image: url('icons/betting.png'); }
+.icon-betsdata .icon-image { background-image: url('icons/bets.png'); }
+.icon-stats .icon-image { background-image: url('icons/chart.png'); }
+.icon-rules .icon-image { background-image: url('icons/txt-file.png'); }
 .icon-recycleBin .icon-image { background-image: url('icons/recycle-bin.png'); }
 
-
-/* Positions for ordered stack */
+/* Icon positions */
 .icon-mycomputer { top: 12px; left: 12px; }
-.icon-betting    { top: 122px; left: 12px; }
-.icon-betsdata   { top: 232px; left: 12px; }
-.icon-stats      { top: 342px; left: 12px; }
-.icon-rules      { top: 452px; left: 12px; }
+.icon-betting { top: 122px; left: 12px; }
+.icon-betsdata { top: 232px; left: 12px; }
+.icon-stats { top: 342px; left: 12px; }
+.icon-rules { top: 452px; left: 12px; }
 .icon-recycleBin { top: 562px; left: 12px; }
 
 /* ================== Windows ================== */
@@ -123,153 +118,50 @@ textarea { min-height: 160px; }
   resize: both;
   overflow: hidden;
 }
+
 .app-window .title-bar { cursor: move; }
 .app-window.active { z-index: 1000; }
 .app-window.minimized { display: none; }
 .app-window.maximized {
-  top: 0 !important; left: 0 !important;
-  width: 100vw !important; height: calc(100vh - 32px) !important;
+  top: 0 !important; 
+  left: 0 !important;
+  width: 100vw !important; 
+  height: calc(100vh - 32px) !important;
   resize: none;
 }
 
-/* Window positions and sizes */
-#window-betting { top: 50px; left: 150px;  width: 500px; height: 350px; }
-#window-bets    { top: 50px; left: 700px; width: 450px; height: 650px; }
-#window-stats   { top: 130px; left: 200px; width: 1500px; height: 1000px; display: none; }
-#window-rules   { top: 170px; left: 400px; width: 600px; height: 600px; display: none; }
-#window-mycomputer { top: 160px; left: 380px; width: 600px; height: 240px; display: none; }
-#window-recycle { top: 180px; left: 420px; width: 520px; height: 420px; display: none; }
+/* Window positions - ikkunoiden piilotus */
+#window-betting { top: 50px; left: 150px; width: 500px; height: 350px; display: none; min-width: 400px ; min-height: 320px;}
+#window-bets { top: 50px; left: 700px; width: 450px; height: 650px; display: none; min-width: 400px }
+#window-stats { top: 130px; left: 200px; width: 1500px; height: 1000px; display: none; min-width: 500px}
+#window-rules { top: 170px; left: 400px; width: 600px; height: 600px; display: none; }
+#window-explorer { top: 100px; left: 200px; width: 600px; height: 450px; display: none; }
 
-/* Panels & Lists */
-.stats-panel { 
-  background:#008080; 
-  color:#fff; 
-  padding:12px; 
-  border:2px outset #c0c0c0; 
-  margin:8px 0; 
-  height: calc(100% - 20px);
-  overflow-y: auto;
-}
-.stats-panel h4 { margin: 12px 0 6px; font-weight: bold; }
-.stats-row { display:flex; justify-content:space-between; margin:6px 0; }
-.stats-sublist { margin-top: 16px; }
-.stats-sublist ul { list-style: none; margin: 0; padding: 0; }
-.stats-sublist li { 
-  display:flex; 
-  justify-content:space-between; 
-  gap:12px; 
-  padding:3px 0; 
-  border-bottom: 1px solid rgba(255,255,255,0.1);
-}
-
-/* Length Chart */
-.length-chart {
-  margin: 12px 0;
-  background: rgba(255,255,255,0.1);
-  border: 1px solid rgba(255,255,255,0.2);
-  padding: 10px;
-  border-radius: 4px;
-}
-
-.chart-container {
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-around;
-  height: 120px;
-  margin-bottom: 8px;
-  padding: 5px;
-  background: rgba(0,0,0,0.1);
-  border-radius: 3px;
-  border-bottom: 2px solid rgba(255,255,255,0.3); /* Bottom baseline */
-}
-
-.chart-bar-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  min-width: 30px;
-  height: 100%;
-  justify-content: flex-end; /* Align everything to bottom */
-}
-
-.chart-bar {
-  width: 20px;
-  min-height: 5px;
-  border-radius: 2px 2px 0 0;
-  border: 1px solid rgba(255,255,255,0.3);
-  display: flex;
-  align-items: flex-start; /* Put value at top of bar */
-  justify-content: center;
-  margin-bottom: 2px;
-  position: relative;
-  cursor: pointer;
-  transition: transform 0.2s ease;
-}
-
-.chart-bar:hover {
-  transform: scale(1.1);
-}
-
-.bar-value {
-  color: #fff;
-  font-size: 11px;
-  font-weight: bold;
-  text-shadow: 1px 1px 1px rgba(0,0,0,0.5);
-  margin-top: 2px; /* Put value at top of bar */
-}
-
-.bar-label {
-  font-size: 12px;
-  color: #fff;
-  text-align: center;
-  margin-top: 2px;
-}
-
-.chart-legend {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  justify-content: center;
-  margin-top: 8px;
-}
-
-.legend-item {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 12px;
-}
-
-.legend-color {
-  width: 12px;
-  height: 12px;
-  border-radius: 2px;
-  border: 1px solid rgba(255,255,255,0.3);
-}
-
-.no-data {
-  text-align: center;
-  color: rgba(255,255,255,0.7);
-  font-style: italic;
-  padding: 20px;
-}
-
+/* ================== Betting System ================== */
 .odds-display {
-  background:#000080; color:#00ff00; padding:12px; margin:8px 0; text-align:center;
-  border:2px inset #c0c0c0;
+  background: #000080; 
+  color: #00ff00; 
+  padding: 12px; 
+  margin: 8px 0; 
+  text-align: center;
+  border: 2px inset #c0c0c0;
 }
-.odds-value { font-weight:bold; text-shadow:1px 1px 0 #004000; }
+
+.odds-value { font-weight: bold; text-shadow: 1px 1px 0 #004000; }
 
 .winnings-display {
-  background:#008000; color:#fff; padding:12px; margin:8px 0; text-align:center;
-  border:2px inset #c0c0c0;
+  background: #008000; 
+  color: #fff; 
+  padding: 12px; 
+  margin: 8px 0; 
+  text-align: center;
+  border: 2px inset #c0c0c0;
 }
-.winnings-value { font-weight:bold; }
 
-.info-box { background:#ffffc0; border:1px solid #808080; padding:8px; margin:8px 0; color:#000; }
+.winnings-value { font-weight: bold; }
+.submit-btn { width: 100%; font-weight: bold; margin-top: 8px; }
 
-.submit-btn { width:100%; font-weight:bold; margin-top:8px; }
-
+/* ================== Bet Lists ================== */
 .bet-list { 
   height: calc(100% - 20px);
   max-height: calc(100% - 20px); 
@@ -281,306 +173,191 @@ textarea { min-height: 160px; }
   margin: 8px 0;
 }
 
-/* Ensure the window body has proper height */
 #window-bets .window-body {
-  height: calc(100% - 30px); /* Account for title bar */
-  overflow: hidden; /* Prevent double scrollbars */
+  height: calc(100% - 30px);
+  overflow: hidden;
   padding: 8px;
 }
 
 .bet-item { 
-  background:#fff; 
-  border:1px solid #808080; 
-  padding:8px; 
-  margin-bottom:6px; 
-  flex-shrink: 0; /* Prevent items from shrinking */
+  background: #fff; 
+  border: 1px solid #808080; 
+  padding: 8px; 
+  margin-bottom: 6px; 
+  flex-shrink: 0;
 }
 
 .bet-header { 
-  display:flex; 
-  justify-content:space-between; 
+  display: flex; 
+  justify-content: space-between; 
   align-items: center;
-  border-bottom:1px solid #e0e0e0; 
-  margin-bottom:6px; 
-  padding-bottom:4px; 
+  border-bottom: 1px solid #e0e0e0; 
+  margin-bottom: 6px; 
+  padding-bottom: 4px; 
 }
 
-.bet-amount { font-weight:bold; color:#008000; font-size: 15px; }
+.bet-amount { font-weight: bold; color: #008000; font-size: 15px; }
 
 .bet-time { 
-  background:#0066cc; 
-  color:#fff; 
-  padding:2px 6px; 
-  border:1px outset #c0c0c0; 
+  background: #0066cc; 
+  color: #fff; 
+  padding: 2px 6px; 
+  border: 1px outset #c0c0c0; 
   font-size: 14px;
   border-radius: 2px;
 }
 
 .bet-timestamp {
-  color:#666; 
-  margin-top:6px; 
-  border-top:1px solid #e0e0e0; 
-  padding-top:4px;
+  color: #666; 
+  margin-top: 6px; 
+  border-top: 1px solid #e0e0e0; 
+  padding-top: 4px;
   font-size: 10px;
 }
 
 .group-header { 
-  background:#808080; 
-  color:#fff; 
-  padding:6px 8px; 
-  margin:10px 0 6px; 
-  font-weight:bold; 
+  background: #808080; 
+  color: #fff; 
+  padding: 6px 8px; 
+  margin: 10px 0 6px; 
+  font-weight: bold; 
   display: flex;
   justify-content: space-between;
   align-items: center;
-  flex-shrink: 0; /* Prevent headers from shrinking */
+  flex-shrink: 0;
   position: sticky;
   top: 0;
   z-index: 10;
 }
 
 .no-bets-message { 
-  text-align:center; 
-  color:#808080; 
-  font-style:italic; 
-  padding:20px; 
+  text-align: center; 
+  color: #808080; 
+  font-style: italic; 
+  padding: 20px; 
 }
 
-.notepad-content { background:#fff; padding:10px; height:calc(100% - 20px); overflow:auto; white-space:pre-wrap; }
+/* ================== Stats Panel ================== */
 
-/* My Computer */
-.computer-content { display:grid; grid-template-columns: repeat(auto-fill, 160px); gap:16px; padding:12px; }
-.drive-icon { text-align:center; cursor:pointer; }
-.drive-image {
-  width:48px; height:48px; margin:0 auto 4px;
-  background: url('icons/hard-drive.png') center/contain no-repeat;
-  image-rendering: pixelated;
-}
-.drive-label { color:#000; }
-
-/* Recycle Bin empty folder */
-.folder-empty {
-  background:#fff; border:1px solid #c0c0c0; padding:20px; text-align:center; color:#808080;
-}
-
-/* ================== Taskbar ================== */
-.taskbar {
-  position: fixed; bottom: 0; left: 0; right: 0; height: 32px;
-  background: #c0c0c0; border-top: 1px solid #dfdfdf;
-  display: flex; align-items: center; padding: 0 6px; gap: 6px; z-index: 9999;
-}
-
-/* Start */
-.start-button {
-  display: inline-flex; align-items: center; gap: 6px;
-  height: 26px; padding: 0 10px; font-weight: bold;
-}
-.start-icon { width: 18px; height: 18px; image-rendering: pixelated; }
-
-/* Taskbar buttons with scaled-down icons */
-.taskbar-buttons { flex: 1; display: flex; gap: 4px; overflow-x: auto; }
-.taskbar-button {
-  display:inline-flex; align-items:center; gap:6px;
-  height: 26px; padding: 0 8px; max-width: 220px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
-}
-.taskbar-button.active { border: 2px inset !important; }
-.taskbar-button.minimized { 
-  background: #c0c0c0; 
-  border: 1px outset #c0c0c0; 
-  opacity: 0.8;
-}
-.taskbar-button .tb-icon { width:16px; height:16px; image-rendering: pixelated; }
-
-/* Clock */
-.taskbar-time { margin-left: auto; border: 1px inset; padding: 2px 8px; background: #c0c0c0; }
-
-/* ================== Messages ================== */
-.message {
-  padding: 8px 12px;
-  margin: 8px 0;
-  border: 1px solid;
-  display: none;
-}
-.success-message {
-  background: #d4edda;
-  color: #155724;
-  border-color: #c3e6cb;
-}
-.error-message {
-  background: #f8d7da;
-  color: #721c24;
-  border-color: #f5c6cb;
-}
-
-/* ================== Mobile Responsive ================== */
-@media (max-width: 900px) {
-  /* Force all individual windows to be full screen on mobile */
-  #window-betting,
-  #window-bets,
-  #window-stats,
-  #window-rules,
-  #window-mycomputer,
-  #window-recycle {
-    position: fixed !important;
-    top: 0 !important;
-    left: 0 !important;
-    width: 100vw !important;
-    height: 100vh !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    resize: none !important;
-  }
-  body {
-    background: url('wallpaper.png') center/contain no-repeat;
-    background-size: contain;
-    background-attachment: scroll;
-    background-position: center center;
-    overflow: auto; 
-    font-size: 16px;
-    /* Create visual margins without distorting image */
-    background-origin: content-box;
-    padding: 20px; /* This creates the 20px border effect */
-  }
-  
-  #desktop { 
-    position: relative;
-    height: auto; 
-    min-height: calc(100vh - 90px); /* Account for body padding + taskbar */
-    padding: 15px 10px 10px 15px; /* Reduced since body has padding now */
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 10px;
-  }
-.taskbar {
-  height: 40px;
-  padding: 0 6px;
-  display: flex; /* Ensure flex layout */
-  align-items: center;
-  gap: 4px;
-  overflow: hidden; /* Changed from overflow-x: auto */
-  flex-wrap: nowrap;
-}
-
-.start-button {
-  height: 28px;
-  width: 50px;
-  min-width: 36px;
-  padding: 0;
-  flex-shrink: 0;
+#window-stats .window-body {
+  padding: 4px;
+  height: calc(100% - 30px);
   display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0; /* Hide text */
-  text-indent: -9999px;
+  flex-direction: column;
 }
 
-.start-button .start-icon {
+
+.stats-panel { 
+  border: 5px inset #c0c0c0;
+  background: #008080; 
+  color: #fff; 
+  padding: 12px; 
+  margin: 8px 0; 
+  height: calc(100% - 20px);
+  overflow-y: scroll;
+  flex-direction: column;
+  border: 2px inset #c0c0c0;
+
+}
+
+
+.stats-panel h4 { margin: 12px 0 6px; font-weight: bold; }
+.stats-row { display: flex; justify-content: space-between; margin: 6px 0; }
+.stats-sublist { margin-top: 16px; }
+.stats-sublist ul { list-style: none; margin: 0; padding: 0; }
+.stats-sublist li { 
+  display: flex; 
+  justify-content: space-between; 
+  gap: 12px; 
+  padding: 3px 0; 
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+/* Charts */
+.chart-container {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-around;
+  height: 120px;
+  margin-bottom: 8px;
+  padding: 5px;
+  background: rgba(0,0,0,0.1);
+  border-radius: 3px;
+  border-bottom: 2px solid rgba(255,255,255,0.3);
+}
+
+.chart-bar-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 30px;
+  height: 100%;
+  justify-content: flex-end;
+}
+
+.chart-bar {
   width: 20px;
-  height: 20px;
-}
-
-.taskbar-buttons {
-  flex: 1; /* Take remaining space */
+  min-height: 5px;
+  border-radius: 2px 2px 0 0;
+  border: 1px solid rgba(255,255,255,0.3);
   display: flex;
-  gap: 2px;
-  overflow-x: auto; /* Only taskbar-buttons can scroll */
-  overflow-y: hidden;
-  scrollbar-width: none; /* Firefox */
-  -ms-overflow-style: none; /* IE */
-}
-
-.taskbar-buttons::-webkit-scrollbar {
-  display: none; /* Chrome/Safari */
-}
-
-.taskbar-button {
-  height: 28px;
-  width: 50px;
-  min-width: 36px;
-  max-width: 50px;
-  padding: 0;
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
+  margin-bottom: 2px;
+  position: relative;
+  cursor: pointer;
+  transition: transform 0.2s ease;
 }
 
-.taskbar-button .tb-icon { 
-  width: 20px;
-  height: 20px; 
-  image-rendering: pixelated; 
+.chart-bar:hover { transform: scale(1.1); }
+
+.bar-value {
+  color: #fff;
+  font-size: 11px;
+  font-weight: bold;
+  text-shadow: 1px 1px 1px rgba(0,0,0,0.5);
+  margin-top: 2px;
 }
 
-/* Hide text in taskbar buttons */
-.taskbar-button span {
-  display: none;
+.bar-label {
+  font-size: 12px;
+  color: #fff;
+  text-align: center;
+  margin-top: 2px;
 }
 
-.taskbar-time {
+.no-data {
+  text-align: center;
+  color: rgba(255,255,255,0.7);
+  font-style: italic;
+  padding: 20px;
+}
+
+/* ================== Text Viewer ================== */
+#window-rules .window-body {
+  padding: 4px;
+  height: calc(100% - 30px);
+  display: flex;
+  flex-direction: column;
+}
+
+
+.notepad-content { 
+  background: #fff; 
+  padding: 10px; 
+  height: calc(100% - 20px); 
+  overflow-y: auto; 
+  overflow-x: hidden;
+  white-space: pre-wrap; 
+  font-family: 'Courier New', monospace;
   font-size: 14px;
-  padding: 2px 8px;
-  flex-shrink: 0;
-  white-space: nowrap; /* Prevent time from wrapping */
-}
-  
-  /* Mobile messages */
-  .message {
-    position: fixed;
-    top: 60px;
-    left: 10px;
-    right: 10px;
-    z-index: 9999;
-    font-size: 16px;
-  }
-  
-  /* Mobile notepad */
-  .notepad-content {
-    font-size: 16px;
-    line-height: 1.4;
-  }
-  
-  /* Mobile computer content */
-  .computer-content {
-    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-    gap: 20px;
-    padding: 20px;
-  }
-  
-  .drive-icon {
-    padding: 15px;
-  }
+  line-height: 1.4;
+  border: 2px inset #c0c0c0;
+  margin: 4px;
 }
 
-/* Extra small screens */
-@media (max-width: 320px) {
-  body { font-size: 14px; }
-  
-  .desktop-icon { 
-    width: 70px;
-    height: 90px;
-  }
-  .desktop-icon span { font-size: 12px; }
-  
-  .field-row input,
-  .field-row select {
-    font-size: 16px; /* Keep at 16px to prevent zoom */
-  }
-  
-  .taskbar { height: 36px; }
-  .start-button { height: 28px; font-size: 12px; }
-  .taskbar-button { height: 28px; font-size: 12px; min-width: 100px; }
-}
 
 /* ================== File Explorer ================== */
-#window-explorer { 
-  top: 100px; 
-  left: 200px; 
-  width: 600px; 
-  height: 450px; 
-  display: none; 
-}
-
 #window-explorer .window-body {
   padding: 4px;
   height: calc(100% - 30px);
@@ -597,6 +374,8 @@ textarea { min-height: 160px; }
   font-size: 14px;
   height: 32px;
   flex-shrink: 0;
+  border: 2px outset #c0c0c0;
+  border-bottom: 2px inset #c0c0c0;
 }
 
 .explorer-address .explorer-btn {
@@ -612,14 +391,8 @@ textarea { min-height: 160px; }
   flex-shrink: 0;
 }
 
-.explorer-address .explorer-btn:hover {
-  border: 1px outset #c0c0c0;
-}
-
-.explorer-address .explorer-btn:active {
-  border: 1px inset #c0c0c0;
-}
-
+.explorer-address .explorer-btn:hover { border: 1px outset #c0c0c0; }
+.explorer-address .explorer-btn:active { border: 1px inset #c0c0c0; }
 .explorer-address .explorer-btn:disabled {
   opacity: 0.5;
   cursor: default;
@@ -642,11 +415,11 @@ textarea { min-height: 160px; }
 }
 
 .explorer-content {
-  border-top: 1px solid #808080;
   background: white;
   flex: 1;
   padding: 8px;
-  margin-top: 6px; 
+  margin-top: 6px;
+  border: 2px inset #c0c0c0;
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
   grid-auto-rows: 80px;
@@ -683,21 +456,10 @@ textarea { min-height: 160px; }
   margin-bottom: 4px;
 }
 
-.file-icon.folder {
-  background: url('icons/folder.png') center/contain no-repeat;
-}
-
-.file-icon.image {
-  background: url('icons/img.png') center/contain no-repeat;
-}
-
-.file-icon.drive {
-  background: url('icons/hard-drive.png') center/contain no-repeat;
-}
-
-.file-icon.txt {
-  background: url('icons/txt-file.png') center/contain no-repeat;
-}
+.file-icon.folder { background: url('icons/folder.png') center/contain no-repeat; }
+.file-icon.image { background: url('icons/img.png') center/contain no-repeat; }
+.file-icon.drive { background: url('icons/hard-drive.png') center/contain no-repeat; }
+.file-icon.txt { background: url('icons/txt-file.png') center/contain no-repeat; }
 
 .file-name {
   font-size: 12px;
@@ -706,8 +468,114 @@ textarea { min-height: 160px; }
   line-height: 1.2;
 }
 
-/* Mobile explorer adjustments */
+/* ================== Taskbar ================== */
+.taskbar {
+  position: fixed; 
+  bottom: 0; 
+  left: 0; 
+  right: 0; 
+  height: 32px;
+  background: #c0c0c0; 
+  border-top: 1px solid #dfdfdf;
+  display: flex; 
+  align-items: center; 
+  padding: 0 6px; 
+  gap: 6px; 
+  z-index: 9999;
+}
+
+.start-button {
+  display: inline-flex; 
+  align-items: center; 
+  gap: 6px;
+  height: 26px; 
+  padding: 0 10px; 
+  font-weight: bold;
+}
+
+.start-icon { width: 18px; height: 18px; image-rendering: pixelated; }
+
+.taskbar-buttons { flex: 1; display: flex; gap: 4px; overflow-x: auto; }
+
+.taskbar-button {
+  display: inline-flex; 
+  align-items: center; 
+  gap: 6px;
+  height: 26px; 
+  padding: 0 8px; 
+  max-width: 220px; 
+  overflow: hidden; 
+  text-overflow: ellipsis; 
+  white-space: nowrap;
+}
+
+.taskbar-button.active { border: 2px inset !important; }
+.taskbar-button.minimized { 
+  background: #c0c0c0; 
+  border: 1px outset #c0c0c0; 
+  opacity: 0.8;
+}
+
+.taskbar-button .tb-icon { width: 16px; height: 16px; image-rendering: pixelated; }
+
+.taskbar-time { 
+  margin-left: auto; 
+  border: 1px inset; 
+  padding: 2px 8px; 
+  background: #c0c0c0; 
+}
+
+/* ================== Messages ================== */
+.message {
+  padding: 8px 12px;
+  margin: 8px 0;
+  border: 1px solid;
+  display: none;
+}
+
+.success-message {
+  background: #d4edda;
+  color: #155724;
+  border-color: #c3e6cb;
+}
+
+.error-message {
+  background: #f8d7da;
+  color: #721c24;
+  border-color: #f5c6cb;
+}
+
+/* ================== Mobile Responsive ================== */
 @media (max-width: 900px) {
+  /* Wallpaper */
+  body {
+    background: url('wallpaper.png') center/contain no-repeat;
+    background-size: contain;
+    background-attachment: scroll;
+    background-position: center center;
+    overflow: auto; 
+    font-size: 16px;
+    background-origin: content-box;
+    padding: 20px;
+  }
+  
+  /* Desktop layout */
+  #desktop { 
+    position: relative;
+    height: auto; 
+    min-height: calc(100vh - 90px);
+    padding: 15px 10px 10px 15px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  
+  /* Force all windows full screen */
+  #window-betting,
+  #window-bets,
+  #window-stats
+  #window-rules,
   #window-explorer {
     position: fixed !important;
     top: 0 !important;
@@ -718,20 +586,102 @@ textarea { min-height: 160px; }
     padding: 0 !important;
     resize: none !important;
   }
-    
-.explorer-content {
-  background: white;
-  flex: 1;
-  padding: 8px;
-  border-top: 2px solid #c0c0c0; /* Visual separator line */
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-  grid-auto-rows: 80px;
-  gap: 8px;
-  align-content: start;
-  overflow-y: auto;
-  height: calc(100% - 62px); /* Adjust for the border (60px + 2px border) */
-}
+
+  /* Mobile taskbar */
+  .taskbar {
+    height: 40px;
+    padding: 0 6px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    overflow: hidden;
+    flex-wrap: nowrap;
+  }
+
+  .start-button {
+    height: 28px;
+    width: 50px;
+    min-width: 36px;
+    padding: 0;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0;
+    text-indent: -9999px;
+  }
+
+  .start-button .start-icon {
+    width: 20px;
+    height: 20px;
+  }
+
+  .taskbar-buttons {
+    flex: 1;
+    display: flex;
+    gap: 2px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .taskbar-buttons::-webkit-scrollbar {
+    display: none;
+  }
+
+  .taskbar-button {
+    height: 28px;
+    width: 50px;
+    min-width: 36px;
+    max-width: 50px;
+    padding: 0;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .taskbar-button .tb-icon { 
+    width: 20px;
+    height: 20px; 
+    image-rendering: pixelated; 
+  }
+
+  .taskbar-button span {
+    display: none;
+  }
+
+  .taskbar-time {
+    font-size: 14px;
+    padding: 2px 8px;
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
+
+  /* Mobile text viewer */
+  .notepad-content {
+    font-size: 16px;
+    line-height: 1.4;
+    height: calc(100vh - 80px);
+    -webkit-overflow-scrolling: touch;
+    padding: 15px;
+  }
+
+  /* Mobile file explorer */
+  .explorer-content {
+    background: white;
+    flex: 1;
+    padding: 8px;
+    border-top: 2px solid #c0c0c0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    grid-auto-rows: 80px;
+    gap: 8px;
+    align-content: start;
+    overflow-y: auto;
+    height: calc(100% - 62px);
+  }
   
   .file-item {
     padding: 4px 2px;
@@ -756,4 +706,35 @@ textarea { min-height: 160px; }
     width: 18px;
     height: 18px;
   }
+
+  /* Mobile messages */
+  .message {
+    position: fixed;
+    top: 60px;
+    left: 10px;
+    right: 10px;
+    z-index: 9999;
+    font-size: 16px;
+  }
+}
+
+/* Extra small screens */
+@media (max-width: 320px) {
+  body { font-size: 14px; }
+  
+  .desktop-icon { 
+    width: 70px;
+    height: 90px;
+  }
+  
+  .desktop-icon span { font-size: 12px; }
+  
+  .field-row input,
+  .field-row select {
+    font-size: 16px;
+  }
+  
+  .taskbar { height: 36px; }
+  .start-button { height: 28px; }
+  .taskbar-button { height: 28px; }
 }
