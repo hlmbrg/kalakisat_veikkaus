@@ -574,13 +574,14 @@ textarea { min-height: 160px; }
   /* Force all windows full screen */
   #window-betting,
   #window-bets,
-  #window-stats
+  #window-stats,
   #window-rules,
   #window-explorer {
     position: fixed !important;
     top: 0 !important;
     left: 0 !important;
     width: 100vw !important;
+    min-width: 200px !important;
     height: 100vh !important;
     margin: 0 !important;
     padding: 0 !important;

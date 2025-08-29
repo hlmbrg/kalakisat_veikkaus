@@ -701,7 +701,7 @@ function initFileExplorer() {
     });
   });
 
-  // Rest of the function stays the same...
+  // Add click handlers for file/folder selection in explorer
   document.addEventListener('click', (e) => {
     if (e.target.closest('.explorer-content')) {
       const fileItem = e.target.closest('.file-item');
@@ -713,24 +713,55 @@ function initFileExplorer() {
     }
   });
   
-  document.addEventListener('dblclick', (e) => {
-    const fileItem = e.target.closest('.file-item');
-    if (fileItem) {
-      const fileName = fileItem.querySelector('.file-name').textContent;
-      const fileIcon = fileItem.querySelector('.file-icon');
-      
-      if (fileIcon.classList.contains('folder')) {
-        openFolder(fileName);
-      } else if (fileIcon.classList.contains('drive')) {
-        const drivePath = fileName.match(/\(([^)]+)\)/);
-        if (drivePath) {
-          openFolder(drivePath[1]);
-        }
-      } else {
-        openFile(fileName);
+  // Add double-click handler for desktop
+  if (!isMobile()) {
+    document.addEventListener('dblclick', (e) => {
+      const fileItem = e.target.closest('.file-item');
+      if (fileItem && e.target.closest('.explorer-content')) {
+        handleFileItemOpen(fileItem);
       }
+    });
+  }
+  
+  // Add touch handler for mobile file items
+  if (isMobile()) {
+    let fileTouchTimeout = null;
+    
+    document.addEventListener('touchstart', (e) => {
+      const fileItem = e.target.closest('.file-item');
+      if (!fileItem || !e.target.closest('.explorer-content')) return;
+      
+      e.preventDefault();
+      
+      if (fileTouchTimeout) {
+        clearTimeout(fileTouchTimeout);
+        fileTouchTimeout = null;
+        handleFileItemOpen(fileItem);
+      } else {
+        selectFile(fileItem);
+        fileTouchTimeout = setTimeout(() => {
+          fileTouchTimeout = null;
+        }, 300);
+      }
+    });
+  }
+}
+
+// Add this helper function after initFileExplorer
+function handleFileItemOpen(fileItem) {
+  const fileName = fileItem.querySelector('.file-name').textContent;
+  const fileIcon = fileItem.querySelector('.file-icon');
+  
+  if (fileIcon.classList.contains('folder')) {
+    openFolder(fileName);
+  } else if (fileIcon.classList.contains('drive')) {
+    const drivePath = fileName.match(/\(([^)]+)\)/);
+    if (drivePath) {
+      openFolder(drivePath[1]);
     }
-  });
+  } else {
+    openFile(fileName);
+  }
 }
 
 // Add this helper function
