@@ -4,6 +4,7 @@ let isDragging = false;
 let dragWindow = null;
 let dragOffset = { x: 0, y: 0 };
 
+
 document.addEventListener('DOMContentLoaded', async () => {
   // Make functions globally available first
   window.minimizeWindow = minimizeWindow;
@@ -176,11 +177,6 @@ function openWindow(windowId) {
   win.style.display = 'block';
   win.dataset.wasOpened = 'true';
   
-  // Special handling for rules window - load rules when first opened
-  if (windowId === 'window-rules') {
-    loadRules();
-  }
-  
   // Then activate it
   activateWindow(windowId);
 }
@@ -284,11 +280,6 @@ function updateTaskbar() {
         win.style.display = 'block';
         win.dataset.wasOpened = 'true';
         
-        // Special handling for rules window - load rules when restored
-        if (id === 'window-rules') {
-          loadRules();
-        }
-        
         activateWindow(id);
       } else {
         // Just activate the window (don't open if it's closed)
@@ -355,11 +346,16 @@ function initDesktopIcons() {
       const app = icon.dataset.app;
       console.log(`Double-clicked icon: ${app}`);
       
+      if (app === 'rules') {
+        // Open rules as a text file
+        openTextViewer('säännöt.txt');
+        return;
+      }
+
       const targetId = app === 'mycomputer' ? 'window-mycomputer'
                      : app === 'betting'    ? 'window-betting'
                      : app === 'betsdata'   ? 'window-bets'
                      : app === 'stats'      ? 'window-stats'
-                     : app === 'rules'      ? 'window-rules'
                      : app === 'recyclebin' ? 'window-recycle'
                      : null;
       
@@ -465,11 +461,6 @@ function activateWindowMobile(windowId) {
     window.bettingSystem.updateStats();
   }
 
-  // Load rules if needed
-  if (windowId === 'window-rules') {
-    loadRules();
-  }
-
   updateTaskbar();
   console.log(`Activated mobile window: ${windowId}`);
 }
@@ -481,11 +472,12 @@ function handleIconOpen(app) {
     openUnifiedExplorer('Oma tietokone');
   } else if (app === 'recyclebin') {
     openUnifiedExplorer('Roskakori');
+  } else if (app === 'rules') {
+    openTextViewer('säännöt.txt');
   } else {
     const targetId = app === 'betting' ? 'window-betting'
                    : app === 'betsdata' ? 'window-bets'
                    : app === 'stats' ? 'window-stats'
-                   : app === 'rules' ? 'window-rules'
                    : null;
     
     if (targetId) {
@@ -521,11 +513,6 @@ function openWindowMobile(windowId) {
   // Show and setup the target window
   win.style.display = 'block';
   win.dataset.wasOpened = 'true';
-  
-  // Special handling for rules window
-  if (windowId === 'window-rules') {
-    loadRules();
-  }
   
   activateWindowMobile(windowId);
 }
@@ -588,8 +575,8 @@ const driveContents = {
     files: [],
     drives: [
       { name: 'Kiintolevy (C:)', path: 'C:', icon: 'hard-drive' },
-      { name: 'Tissikuvat (D:)', path: 'D:', icon: 'hard-drive' },
-      { name: 'Kalakuvat (E:)', path: 'E:', icon: 'hard-drive' }
+      { name: 'Tissit (D:)', path: 'D:', icon: 'hard-drive' },
+      { name: 'Kalastus (E:)', path: 'E:', icon: 'hard-drive' }
     ]
   },
   'Roskakori': {
@@ -601,12 +588,12 @@ const driveContents = {
     files: []
   },
   'D:': {
-    folders: ['Tissikuvat', 'Varmuuskopiot'],
-    files: []
+    folders: ['Varmuuskopiot'],
+    files: ['sydney_sweeney.png','sydney_sweeney2.png']
   },
   'E:': {
-    folders: ['Kalakuvat', 'Kilpailutulokset'],
-    files: ['kala001.jpg', 'iso_saalis.png', 'jarvi_auringonlasku.jpg']
+    folders: ['Kilpailutulokset'],
+    files: ['mikan_vauvahauki.jpg','villen_ahven.png','matun_hauki.jpg']
   }
 };
 
@@ -614,40 +601,24 @@ const driveContents = {
 const folderContents = {
   'Tissikuvat': {
     folders: [],
-    files: ['sydney_sweeney.png','sydney_sweeney2.png', 'bonnie_blue.png']
-  },
-  'Kalakuvat': {
-    folders: ['Kesä 2024', 'Parhaat saaliit'],
-    files: ['hauki_45cm.jpg', 'ahvenet.png', 'aamukala.jpg']
+    files: []
   },
   'Asiakirjat': {
-    folders: ['Työ', 'Henkilökohtainen'],
-    files: ['kirje.txt', 'muistio.txt', 'lista.txt']
+    folders: [],
+    files: ['sääntö_ehdotukset.txt']
+  },
+  'Kilpailutulokset': {
+    folders: [],
+    files: ['2020.txt','2021.txt','2022.txt','2023.txt','2024.txt','2025.txt']
   },
   'Kuvat': {
-    folders: ['Valokuvat'],
-    files: ['perhekuva.jpg', 'maisema.png']
-  },
-  'Työ': {
     folders: [],
-    files: ['raportti.txt', 'kokous.txt']
-  },
-  'Henkilökohtainen': {
-    folders: [],
-    files: ['päiväkirja.txt', 'ostoslista.txt']
+    files: []
   },
   'Poistetut kansiot': {
     folders: [],
     files: []
   },
-  'Kesä 2024': {
-    folders: [],
-    files: ['heinakuu_kala.jpg', 'elokuun_saalis.png']
-  },
-  'Parhaat saaliit': {
-    folders: [],
-    files: ['ennatys_hauki.jpg', 'iso_ahven.jpg']
-  }
 };
 
 let currentPath = 'Oma tietokone';
@@ -764,28 +735,6 @@ function handleFileItemOpen(fileItem) {
   }
 }
 
-// Add this helper function
-function handleIconOpen(app) {
-  if (app === 'mycomputer') {
-    openUnifiedExplorer('Oma tietokone');
-  } else if (app === 'recyclebin') {
-    openUnifiedExplorer('Roskakori');
-  } else {
-    const targetId = app === 'betting' ? 'window-betting'
-                   : app === 'betsdata' ? 'window-bets'
-                   : app === 'stats' ? 'window-stats'
-                   : app === 'rules' ? 'window-rules'
-                   : null;
-    
-    if (targetId) {
-      if (isMobile()) {
-        openWindowMobile(targetId);
-      } else {
-        openWindow(targetId);
-      }
-    }
-  }
-}
 
 function openUnifiedExplorer(location) {
   currentPath = location;
@@ -926,8 +875,22 @@ function openFolder(folderName) {
 
 function openFile(fileName) {
   const isImage = /\.(jpg|jpeg|png|gif|bmp)$/i.test(fileName);
-  const isDeleted = currentPath === 'Recycle Bin' || navigationHistory.includes('Recycle Bin');
+  const isTxt = /\.txt$/i.test(fileName);
+  const isDeleted = currentPath === 'Roskakori' || navigationHistory.includes('Roskakori');
   
+  if (isImage && !isDeleted) {
+    // Open image in the image viewer
+    openImageViewer(fileName);
+    return;
+  }
+  
+  if (isTxt && !isDeleted) {
+    // Open text file in the text viewer
+    openTextViewer(fileName);
+    return;
+  }
+  
+  // For non-supported files or deleted files, show the existing message
   const message = document.createElement('div');
   message.style.cssText = `
     position: fixed;
@@ -946,8 +909,6 @@ function openFile(fileName) {
   let messageText;
   if (isDeleted) {
     messageText = `Deleted file: ${fileName}<br><small>File is in Recycle Bin</small>`;
-  } else if (isImage) {
-    messageText = `Opening image: ${fileName}<br><small>Image viewer would open here</small>`;
   } else {
     messageText = `Opening file: ${fileName}<br><small>Associated program would open here</small>`;
   }
@@ -969,12 +930,103 @@ function openFile(fileName) {
   }, 4000);
 }
 
+
+
 function goBack() {
   if (navigationHistory.length > 0) {
     currentPath = navigationHistory.pop();
     updateExplorerUI();
     populateExplorer();
   }
+}
+
+// Text viewer
+function openTextViewer(fileName) {
+  const win = document.getElementById('window-textviewer');
+  const titleBar = win.querySelector('.title-bar-text');
+  const content = document.getElementById('textViewerContent');
+  
+  if (!win || !titleBar || !content) {
+    console.error('Text viewer elements not found');
+    return;
+  }
+  
+  // Set the window title to the file name
+  titleBar.textContent = fileName;
+  
+  // Load the text file content
+  loadTextFile(fileName, content);
+  
+  // Show and activate the window
+  if (isMobile()) {
+    openWindowMobile('window-textviewer');
+  } else {
+    openWindow('window-textviewer');
+  }
+}
+// Loading text files
+function loadTextFile(fileName, contentElement) {
+  if (!contentElement) return;
+  
+  contentElement.textContent = 'Ladataan tiedostoa...';
+  
+  // Construct the path to txt_files folder
+  const filePath = `txt_files/${fileName}`;
+  
+  fetch(filePath + '?_=' + Date.now())
+    .then(r => {
+      if (!r.ok) throw new Error('HTTP ' + r.status + ' - File not found');
+      return r.text();
+    })
+    .then(txt => { 
+      contentElement.textContent = txt; 
+    })
+    .catch(err => { 
+      contentElement.textContent = `Tiedoston lataaminen epäonnistui: ${fileName}\n`; 
+      console.error('Error loading text file:', err); 
+    });
+}
+
+// Image viewer simple
+function openImageViewer(fileName) {
+  const win = document.getElementById('window-imageviewer');
+  const titleBar = win.querySelector('.title-bar-text');
+  const image = document.getElementById('viewerImage');
+  
+  if (!win || !titleBar || !image) {
+    console.error('Image viewer elements not found');
+    return;
+  }
+  
+  // Set the window title to the image name
+  titleBar.textContent = fileName;
+  
+  // Create the image path based on current location
+  let imagePath = getImagePath(fileName);
+  
+  // Set the image source
+  image.src = imagePath;
+  image.alt = `Viewing ${fileName}`;
+  
+  // Handle image load error
+  image.onerror = function() {
+    // If image fails to load, show a placeholder
+    this.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjE1MCIgdmlld0JveD0iMCAwIDIwMCAxNTAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMTUwIiBmaWxsPSIjRjBGMEYwIiBzdHJva2U9IiNEMEQwRDAiLz4KPHN2ZyB4PSI3NSIgeT0iNDAiIHdpZHRoPSI1MCIgaGVpZ2h0PSI1MCIgdmlld0JveD0iMCAwIDUwIDUwIiBmaWxsPSIjQzBDMEMwIj4KPHN2ZyB3aWR0aD0iNTAiIGhlaWdodD0iNTAiIHZpZXdCb3g9IjAgMCA1MCA1MCIgZmlsbD0ibm9uZSI+CjxwYXRoIGQ9Ik0xNS42MjUgMTAuNDE2N0gyOC4xMjVMMzEuMjUgMTMuNTQxN0g0MS42NjY3VjQxLjY2NjdIOC4zMzMzM1YxMy41NDE3SDE1LjYyNVYxMC40MTY3WiIgc3Ryb2tlPSIjOTk5OTk5IiBzdHJva2Utd2lkdGg9IjEuNSIgZmlsbD0ibm9uZSIvPgo8L3N2Zz4KPHN2Zz4KPHR4dCB4PSI1MCIgeT0iMTEwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTQiIGZpbGw9IiM2NjY2NjYiPkltYWdlIG5vdCBmb3VuZDwvdGV4dD4KPHN2Zz4=';
+    this.alt = `Image not found: ${fileName}`;
+  };
+  
+  // Show and activate the window
+  if (isMobile()) {
+    openWindowMobile('window-imageviewer');
+  } else {
+    openWindow('window-imageviewer');
+  }
+}
+
+// Image paths
+function getImagePath(fileName) {
+  // Load all images from the images/ folder
+  return `images/${fileName}`;
 }
 
 function selectFile(fileItem) {

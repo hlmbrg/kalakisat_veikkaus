@@ -11,7 +11,7 @@ html, body {
 }
 
 body {
-  background: url('wallpaper.png') center/cover fixed no-repeat;
+  background: url('images/wallpaper.png') center/cover fixed no-repeat;
   background-size: 1200px 857px;
 }
 
@@ -136,6 +136,40 @@ textarea { min-height: 160px; }
 #window-stats { top: 130px; left: 200px; width: 1500px; height: 1000px; display: none; min-width: 500px}
 #window-rules { top: 170px; left: 400px; width: 600px; height: 600px; display: none; }
 #window-explorer { top: 100px; left: 200px; width: 600px; height: 450px; display: none; }
+
+/* ================== Text Viewer Window ================== */
+#window-textviewer { 
+  top: 170px; 
+  left: 400px; 
+  width: 600px; 
+  height: 600px; 
+  display: none; 
+  min-width: 400px; 
+  min-height: 300px;
+}
+
+#window-textviewer .window-body {
+  padding: 4px;
+  height: calc(100% - 30px);
+  display: flex;
+  flex-direction: column;
+}
+
+/* Make sure the notepad-content class has the same styling as the original rules */
+.notepad-content { 
+  background: #fff; 
+  padding: 10px; 
+  height: calc(100% - 20px); 
+  overflow-y: auto; 
+  overflow-x: hidden;
+  white-space: pre-wrap; 
+  font-family: 'Courier New', monospace;
+  font-size: 14px;
+  line-height: 1.4;
+  border: 2px inset #c0c0c0;
+  margin: 4px;
+}
+
 
 /* ================== Betting System ================== */
 .odds-display {
@@ -333,27 +367,40 @@ textarea { min-height: 160px; }
   padding: 20px;
 }
 
-/* ================== Text Viewer ================== */
-#window-rules .window-body {
-  padding: 4px;
+/* ================== Image Viewer Window ================== */
+#window-imageviewer { 
+  top: 120px; 
+  left: 300px; 
+  width: 600px; 
+  height: 500px; 
+  display: none; 
+  min-width: 300px; 
+  min-height: 200px;
+}
+
+#window-imageviewer .window-body {
   height: calc(100% - 30px);
   display: flex;
   flex-direction: column;
 }
 
+.image-viewer-content {
+  background: #c0c0c0;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
 
-.notepad-content { 
-  background: #fff; 
-  padding: 10px; 
-  height: calc(100% - 20px); 
-  overflow-y: auto; 
-  overflow-x: hidden;
-  white-space: pre-wrap; 
-  font-family: 'Courier New', monospace;
-  font-size: 14px;
-  line-height: 1.4;
+
+.image-viewer-content img {
   border: 2px inset #c0c0c0;
-  margin: 4px;
+  max-width: calc(100% - 8px);
+  max-height: calc(100% - 8px);
+  object-fit: contain;
+  image-rendering: auto;
+  background: #fff;
 }
 
 
@@ -549,7 +596,7 @@ textarea { min-height: 160px; }
 @media (max-width: 900px) {
   /* Wallpaper */
   body {
-    background: url('wallpaper.png') center/contain no-repeat;
+    background: url('images/wallpaper.png') center/contain no-repeat;
     background-size: contain;
     background-attachment: scroll;
     background-position: center center;
@@ -659,7 +706,38 @@ textarea { min-height: 160px; }
     flex-shrink: 0;
     white-space: nowrap;
   }
+  
+  /* Mobile image viewer */
+  #window-imageviewer {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100vw !important;
+    min-width: 200px !important;
+    height: 100vh !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    resize: none !important;
+  }
+  
+  .image-viewer-content {
+    height: calc(100vh - 80px);
+    margin: 4px;
+    padding: 4px;
+  }
 
+    #window-textviewer {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100vw !important;
+    min-width: 200px !important;
+    height: 100vh !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    resize: none !important;
+  }
+  
   /* Mobile text viewer */
   .notepad-content {
     font-size: 16px;

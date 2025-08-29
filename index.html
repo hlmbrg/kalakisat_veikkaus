@@ -4,8 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Kalakisat 2025</title>
-  <link rel="icon" type="image/png" sizes="32x32" href="favicon32.png">
-  <link rel="icon" type="image/png" sizes="16x16" href="favicon16.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon16.png">
   <link rel="stylesheet" href="https://unpkg.com/98.css">
   <link rel="stylesheet" href="styles.css">
 </head>
@@ -70,6 +70,38 @@
     </div>
   </div>
 
+  <!-- Text Viewer Window -->
+  <div id="window-textviewer" class="window app-window">
+    <div class="title-bar">
+      <div class="title-bar-text">Text Viewer</div>
+      <div class="title-bar-controls">
+        <button aria-label="Minimize" onclick="minimizeWindow('window-textviewer')"></button>
+        <button aria-label="Maximize" onclick="maximizeWindow('window-textviewer')"></button>
+        <button aria-label="Close" onclick="closeWindow('window-textviewer')"></button>
+      </div>
+    </div>
+    <div class="window-body">
+      <div id="textViewerContent" class="notepad-content">Ladataan tiedostoa...</div>
+    </div>
+  </div>
+
+
+  <!-- Image Viewer Window -->
+  <div id="window-imageviewer" class="window app-window">
+    <div class="title-bar">
+      <div class="title-bar-text">Image Viewer</div>
+      <div class="title-bar-controls">
+        <button aria-label="Minimize" onclick="minimizeWindow('window-imageviewer')"></button>
+        <button aria-label="Maximize" onclick="maximizeWindow('window-imageviewer')"></button>
+        <button aria-label="Close" onclick="closeWindow('window-imageviewer')"></button>
+      </div>
+    </div>
+    <div class="window-body">
+      <div class="image-viewer-content">
+        <img id="viewerImage" src="" alt="Viewing image" />
+      </div>
+    </div>
+  </div>
 
   <!-- Betting Window -->
   <div id="window-betting" class="window app-window active">
@@ -191,22 +223,6 @@
     </button>
     <div class="taskbar-buttons" id="taskbarButtons"></div>
     <div class="taskbar-time"><span id="currentTime">--:--:--</span></div>
-  </div>
-
-
-  <!-- Rules Window -->
-  <div id="window-rules" class="window app-window">
-    <div class="title-bar">
-      <div class="title-bar-text">säännöt.txt</div>
-      <div class="title-bar-controls">
-        <button aria-label="Minimize" onclick="minimizeWindow('window-rules')"></button>
-        <button aria-label="Maximize" onclick="maximizeWindow('window-rules')"></button>
-        <button aria-label="Close" onclick="closeWindow('window-rules')"></button>
-      </div>
-    </div>
-    <div class="window-body">
-      <div id="rulesContent" class="notepad-content">Ladataan sääntöjä...</div>
-    </div>
   </div>
 
 
