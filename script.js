@@ -57,12 +57,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (window) {
       window.dataset.wasOpened = 'true';
       window.style.display = 'block';
-      console.log(`Opening startup window: ${windowId}`);
-      
-      // Special handling for rules window at startup
-      if (windowId === 'window-rules') {
-        loadRules();
-      }
     }
   });
   
@@ -75,13 +69,13 @@ document.addEventListener('DOMContentLoaded', async () => {
       windowToActivate = startupWindows[0]; // Fallback to first window
     }
     
-    console.log(`Activating startup window: ${windowToActivate}`);
     activateWindow(windowToActivate);
   }
   
   updateTaskbar();
   initMobileEnhancements();
   initFileExplorer();
+  showWinnerPopup();
 });
 
 // ================= Window Click-to-Front =================
@@ -135,7 +129,6 @@ function activateWindow(windowId) {
 
   // Only activate if window is already visible or meant to be opened
   if (win.style.display === 'none') {
-    console.log(`Cannot activate hidden window: ${windowId}`);
     return;
   }
 
@@ -159,13 +152,9 @@ function activateWindow(windowId) {
     window.bettingSystem.updateStats();
   }
 
-  // Note: Rules loading is now handled in openWindow() when first opened
-
   updateTaskbar();
-  console.log(`Activated window: ${windowId} with z-index: ${currentZIndex}`);
 }
 
-// New function to open a window (used by desktop icons)
 function openWindow(windowId) {
   const win = document.getElementById(windowId);
   if (!win) {
@@ -182,7 +171,6 @@ function openWindow(windowId) {
 }
 
 function minimizeWindow(windowId) {
-  console.log(`Minimizing window: ${windowId}`); // Debug log
   const win = document.getElementById(windowId);
   if (!win) {
     console.error(`Window ${windowId} not found for minimizing`);
@@ -204,7 +192,6 @@ function minimizeWindow(windowId) {
 }
 
 function maximizeWindow(windowId) {
-  console.log(`Maximizing window: ${windowId}`); // Debug log
   const win = document.getElementById(windowId);
   if (!win) {
     console.error(`Window ${windowId} not found for maximizing`);
@@ -214,7 +201,6 @@ function maximizeWindow(windowId) {
 }
 
 function closeWindow(windowId) {
-  console.log(`Closing window: ${windowId}`); // Debug log
   const win = document.getElementById(windowId);
   if (!win) {
     console.error(`Window ${windowId} not found for closing`);
@@ -224,6 +210,11 @@ function closeWindow(windowId) {
   // Hide the window and mark it as closed
   win.style.display = 'none';
   win.dataset.wasOpened = 'false'; // Mark as closed so it disappears from taskbar
+
+  // Remember winner popup dismissal for this session
+  if (windowId === 'window-winner') {
+    sessionStorage.setItem('winnerPopupDismissed', 'true');
+  }
   
   // Find another window to activate
   const nextWindow = Array.from(document.querySelectorAll('.app-window'))
@@ -291,18 +282,6 @@ function updateTaskbar() {
   });
 }
 
-function taskbarIconForWindow(id) {
-  switch (id) {
-    case 'window-mycomputer': return 'icons/my-computer.png';
-    case 'window-betting':    return 'icons/betting.png';
-    case 'window-bets':       return 'icons/bets.png';
-    case 'window-stats':      return 'icons/chart.png';
-    case 'window-rules':      return 'icons/txt-file.png';
-    case 'window-recycle':    return 'icons/recycle-bin.png';
-    default: return 'icons/windows.png';
-  }
-}
-
 // ================= Window Dragging =================
 function initWindowDragging() {
   document.querySelectorAll('.app-window .title-bar').forEach(titleBar => {
@@ -341,53 +320,18 @@ function initWindowDragging() {
 
 // ================= Desktop Icons =================
 function initDesktopIcons() {
-  document.querySelectorAll('.desktop-icon').forEach(icon => {
-    icon.addEventListener('dblclick', () => {
-      const app = icon.dataset.app;
-      console.log(`Double-clicked icon: ${app}`);
-      
-      if (app === 'rules') {
-        // Open rules as a text file
-        openTextViewer('säännöt.txt');
-        return;
-      }
-
-      const targetId = app === 'mycomputer' ? 'window-mycomputer'
-                     : app === 'betting'    ? 'window-betting'
-                     : app === 'betsdata'   ? 'window-bets'
-                     : app === 'stats'      ? 'window-stats'
-                     : app === 'recyclebin' ? 'window-recycle'
-                     : null;
-      
-      console.log(`Target window ID: ${targetId}`);
-      
-      if (!targetId) {
-        console.error(`No target window found for app: ${app}`);
-        return;
-      }
-      
-      const win = document.getElementById(targetId);
-      if (!win) {
-        console.error(`Window element not found: ${targetId}`);
-        return;
-      }
-      
-      console.log(`Opening window: ${targetId}`);
-      // Use openWindow instead of activateWindow for desktop icons
-      openWindow(targetId);
-    });
-    
-    icon.addEventListener('click', () => {
-      document.querySelectorAll('.desktop-icon').forEach(i => i.classList.remove('selected'));
-      icon.classList.add('selected');
-    });
-  });
-
+  // Desktop click-to-deselect (icon handlers are set up in initFileExplorer)
   document.getElementById('desktop').addEventListener('click', (e) => {
     if (e.target.id === 'desktop') {
       document.querySelectorAll('.desktop-icon').forEach(i => i.classList.remove('selected'));
     }
   });
+}
+
+// ================= Winner Window =================
+function showWinnerPopup() {
+  if (sessionStorage.getItem('winnerPopupDismissed')) return;
+  openWindow('window-winner');
 }
 
 // ================= Clock =================
@@ -401,25 +345,6 @@ function updateTime() {
   const ss = String(now.getSeconds()).padStart(2, '0');
   timeEl.textContent = `${hh}:${mm}:${ss}`;
 }
-
-// ================= Rules loader =================
-function loadRules() {
-  const el = document.getElementById('rulesContent');
-  if (!el) return;
-  
-  el.textContent = 'Ladataan sääntöjä...';
-  fetch('rules.txt?_=' + Date.now())
-    .then(r => {
-      if (!r.ok) throw new Error('HTTP ' + r.status);
-      return r.text();
-    })
-    .then(txt => { el.textContent = txt; })
-    .catch(err => { 
-      el.textContent = 'Sääntöjen lataaminen epäonnistui.'; 
-      console.error(err); 
-    });
-}
-
 
 // ================= Mobile Detection & Handling =================
 function isMobile() {
@@ -462,7 +387,6 @@ function activateWindowMobile(windowId) {
   }
 
   updateTaskbar();
-  console.log(`Activated mobile window: ${windowId}`);
 }
 
 
@@ -473,11 +397,18 @@ function handleIconOpen(app) {
   } else if (app === 'recyclebin') {
     openUnifiedExplorer('Roskakori');
   } else if (app === 'rules') {
-    openTextViewer('säännöt.txt');
+    openTextViewer('veikkaus_säännöt.txt');
+  } else if (app === 'kisarules') {
+    openTextViewer('kisa_säännöt.txt');
+  } else if (app === 'kartta') {
+    openImageViewer('kilpailu_alue.png');
+  } else if (app === 'kohdelaji') {
+    openImageViewer('kohdelaji.jpg');
   } else {
     const targetId = app === 'betting' ? 'window-betting'
                    : app === 'betsdata' ? 'window-bets'
                    : app === 'stats' ? 'window-stats'
+                   : app === 'calendar' ? 'window-calendar'
                    : null;
     
     if (targetId) {
@@ -547,9 +478,6 @@ function handleOrientationChange() {
 function initMobileEnhancements() {
   if (!isMobile()) return;
   
-  console.log('Initializing mobile enhancements');
-  
-  // Remove this line: addMobileIconHandling();
   preventZoomOnDoubleTap();
   
   // Override window management functions for mobile
@@ -580,8 +508,8 @@ const driveContents = {
     ]
   },
   'Roskakori': {
-    folders: [],
-    files: ['säännöt-2023.txt','säännöt-2024.txt','säännöt-2025.txt','porttikiellot-2023.txt','vp-mestari.png' ,'kalastusalue.png']
+    folders: ['Poistetut kansiot'],
+    files: ['säännöt-2023.txt','säännöt-2024.txt','porttikiellot-2023.txt']
   },
   'C:': {
     folders: ['Windows'],
@@ -592,26 +520,34 @@ const driveContents = {
     files: ['sydney_sweeney.png','sydney_sweeney2.png']
   },
   'E:': {
-    folders: ['Kilpailutulokset'],
-    files: ['mikan_vauvahauki.jpg','villen_ahven.png','matun_hauki.jpg']
+    folders: ['Kilpailut', 'Kuvat'],
+    files: []
   }
 };
 
-// Folder contents with Finnish names
+// Folder contents
 const folderContents = {
-  'Tissikuvat': {
+  'Kilpailut': {
+    folders: ['2025', '2026'],
+    files: []
+  },
+  '2025': {
+    folders: [],
+    files: ['tulokset_2025.txt', 'säännöt_2025.txt']
+  },
+  '2026': {
+    folders: [],
+    files: ['veikkaus_säännöt.txt', 'kisa_säännöt.txt']
+  },
+  'Kuvat': {
+    folders: [],
+    files: ['matun_hauki.jpg']
+  },
+  'Varmuuskopiot': {
     folders: [],
     files: []
   },
-  'Asiakirjat': {
-    folders: [],
-    files: ['sääntö_ehdotukset.txt']
-  },
-  'Kilpailutulokset': {
-    folders: [],
-    files: ['2020.txt','2021.txt','2022.txt','2023.txt','2024.txt','2025.txt']
-  },
-  'Kuvat': {
+  'Windows': {
     folders: [],
     files: []
   },
@@ -718,7 +654,6 @@ function initFileExplorer() {
   }
 }
 
-// Add this helper function after initFileExplorer
 function handleFileItemOpen(fileItem) {
   const fileName = fileItem.querySelector('.file-name').textContent;
   const fileIcon = fileItem.querySelector('.file-icon');
@@ -758,10 +693,10 @@ function updateExplorerUI() {
     let displayPath = currentPath;
     
     // Format different path types
-    if (currentPath === 'My Computer') {
-      displayPath = 'My Computer';
-    } else if (currentPath === 'Recycle Bin') {
-      displayPath = 'Recycle Bin';
+    if (currentPath === 'Oma tietokone') {
+      displayPath = 'Oma tietokone';
+    } else if (currentPath === 'Roskakori') {
+      displayPath = 'Roskakori';
     } else if (currentPath.match(/^[A-Z]:$/)) {
       // Root drive like "C:" becomes "C:\"
       displayPath = currentPath + '\\';
@@ -908,9 +843,9 @@ function openFile(fileName) {
   
   let messageText;
   if (isDeleted) {
-    messageText = `Deleted file: ${fileName}<br><small>File is in Recycle Bin</small>`;
+    messageText = `Poistettu tiedosto: ${fileName}<br><small>Tiedosto on roskakorissa</small>`;
   } else {
-    messageText = `Opening file: ${fileName}<br><small>Associated program would open here</small>`;
+    messageText = `Avataan tiedosto: ${fileName}<br><small>Tiedostolle ei ole ohjelmaa</small>`;
   }
   
   message.innerHTML = `
@@ -1012,7 +947,7 @@ function openImageViewer(fileName) {
   image.onerror = function() {
     // If image fails to load, show a placeholder
     this.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjE1MCIgdmlld0JveD0iMCAwIDIwMCAxNTAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMTUwIiBmaWxsPSIjRjBGMEYwIiBzdHJva2U9IiNEMEQwRDAiLz4KPHN2ZyB4PSI3NSIgeT0iNDAiIHdpZHRoPSI1MCIgaGVpZ2h0PSI1MCIgdmlld0JveD0iMCAwIDUwIDUwIiBmaWxsPSIjQzBDMEMwIj4KPHN2ZyB3aWR0aD0iNTAiIGhlaWdodD0iNTAiIHZpZXdCb3g9IjAgMCA1MCA1MCIgZmlsbD0ibm9uZSI+CjxwYXRoIGQ9Ik0xNS42MjUgMTAuNDE2N0gyOC4xMjVMMzEuMjUgMTMuNTQxN0g0MS42NjY3VjQxLjY2NjdIOC4zMzMzM1YxMy41NDE3SDE1LjYyNVYxMC40MTY3WiIgc3Ryb2tlPSIjOTk5OTk5IiBzdHJva2Utd2lkdGg9IjEuNSIgZmlsbD0ibm9uZSIvPgo8L3N2Zz4KPHN2Zz4KPHR4dCB4PSI1MCIgeT0iMTEwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTQiIGZpbGw9IiM2NjY2NjYiPkltYWdlIG5vdCBmb3VuZDwvdGV4dD4KPHN2Zz4=';
-    this.alt = `Image not found: ${fileName}`;
+    this.alt = `Kuvaa ei löydy: ${fileName}`;
   };
   
   // Show and activate the window
@@ -1051,7 +986,11 @@ function taskbarIconForWindow(id) {
     case 'window-stats':      return 'icons/chart.png';
     case 'window-rules':      return 'icons/txt-file.png';
     case 'window-recycle':    return 'icons/recycle-bin.png';
-    case 'window-explorer':   return 'icons/folder.png'; /* Make sure this line exists */
+    case 'window-explorer':   return 'icons/folder.png';
+    case 'window-textviewer': return 'icons/txt-file.png';
+    case 'window-imageviewer': return 'icons/img.png';
+    case 'window-calendar':   return 'icons/kaikki/calendar-0.png';
+    case 'window-winner':     return 'icons/kaikki/msg_information-0.png';
     default: return 'icons/windows.png';
   }
 }

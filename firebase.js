@@ -1,6 +1,6 @@
 // ================= Firebase Betting System - Simplified =================
 
-// Firebase configuration - replace with your config
+// Firebase configuration
 const firebaseConfig = {
   apiKey: "AIzaSyAYd1XtkfUb4gNyHeO0kEqw68XF-k-e7L0",
   authDomain: "kalakisat-c6a21.firebaseapp.com",
@@ -21,9 +21,8 @@ async function initFirebase() {
     
     const app = initializeApp(firebaseConfig);
     db = getFirestore(app);
-    betsCollection = collection(db, 'bets');
+    betsCollection = collection(db, 'bets_2026');
     
-    console.log('Firebase initialized successfully');
     return { addDoc, getDocs, onSnapshot, query, orderBy };
   } catch (error) {
     console.error('Error initializing Firebase:', error);
@@ -59,7 +58,6 @@ async function loadBetsFromFirebase() {
       bets.push({ id: doc.id, ...doc.data() });
     });
     
-    console.log(`Loaded ${bets.length} bets from Firebase`);
     
     // Clear loading message
     if (successMessage) successMessage.style.display = 'none';
@@ -78,7 +76,7 @@ async function loadBetsFromFirebase() {
     
     // Fallback to localStorage
     try {
-      const raw = localStorage.getItem('bets_v2_simplified');
+      const raw = localStorage.getItem('bets_2026_local');
       bets = raw ? JSON.parse(raw) : [];
       showMessage(`Firebase ei käytettävissä, käytetään paikallista tallennusta. Ladattu ${bets.length} vetoa.`, false);
     } catch (storageError) {
@@ -106,14 +104,13 @@ async function saveBetToFirebase(betData) {
     const docRef = await addDoc(betsCollection, betData);
     const savedBet = { id: docRef.id, ...betData };
     
-    console.log('Bet saved to Firebase with ID:', docRef.id);
     
     // Also save to localStorage as backup
     try {
-      const raw = localStorage.getItem('bets_v2_simplified');
+      const raw = localStorage.getItem('bets_2026_local');
       const localBets = raw ? JSON.parse(raw) : [];
       localBets.push(savedBet);
-      localStorage.setItem('bets_v2_simplified', JSON.stringify(localBets));
+      localStorage.setItem('bets_2026_local', JSON.stringify(localBets));
     } catch (e) {
       // Ignore localStorage errors
     }
@@ -131,13 +128,12 @@ async function saveBetToFirebase(betData) {
     
     // Fallback to localStorage
     try {
-      const raw = localStorage.getItem('bets_v2_simplified');
+      const raw = localStorage.getItem('bets_2026_local');
       const localBets = raw ? JSON.parse(raw) : [];
       const localBet = { id: generateId(), ...betData };
       localBets.push(localBet);
-      localStorage.setItem('bets_v2_simplified', JSON.stringify(localBets));
+      localStorage.setItem('bets_2026_local', JSON.stringify(localBets));
       
-      console.log('Saved bet to localStorage (Firebase fallback)');
       return localBet;
     } catch (storageError) {
       throw new Error('Sekä Firebase että paikallinen tallennus epäonnistuivat');
@@ -167,7 +163,6 @@ async function setupRealtimeListener() {
         bets = newBets;
         renderBets();
         updateStats();
-        console.log(`Real-time update: ${bets.length} bets loaded`);
       }
       
       // Update connection status
@@ -177,7 +172,6 @@ async function setupRealtimeListener() {
       updateConnectionStatus(false);
     });
     
-    console.log('Real-time listener set up');
     return unsubscribe;
     
   } catch (error) {
@@ -255,7 +249,6 @@ function loadSavedFormValues() {
       document.getElementById('voittaja').value = lastWinner;
     }
 
-    console.log('Loaded saved form values:', { lastVeikkaaja, lastWinner });
   } catch (error) {
     console.error('Error loading saved form values:', error);
   }
@@ -516,7 +509,6 @@ function initBettingEventListeners() {
       const voittaja = document.getElementById('voittaja').value; // No trim needed for dropdown
       const amount = parseFloat(document.getElementById('betAmount').value);
 
-      // Enhanced validation
       if (!veikkaaja || !voittaja || !amount) {
         showMessage('ERROR: Täytä kaikki kentät.', true);
         return;
@@ -558,14 +550,12 @@ function initBettingEventListeners() {
         updateOddsDisplay();
         showMessage(`Veto tallennettu! Kerroin: ${odds.toFixed(2)}, Mahdollinen voitto: ${formatCurrency(amount * odds)}`);
         
-        // Note: renderBets() will be called automatically by the real-time listener
-        
+    
       } catch (error) {
         showMessage(`Virhe tallentaessa vetoa: ${error.message}`, true);
       }
     });
 
-    // Live updates - updated to handle dropdown
     ['voittaja','betAmount'].forEach(id => {
       const el = document.getElementById(id);
       if (el) {

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Kalakisat 2025</title>
+  <title>Kalakisat 2026</title>
   <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon16.png">
   <link rel="stylesheet" href="https://unpkg.com/98.css">
@@ -35,9 +35,29 @@
     
     <div class="desktop-icon icon-rules" data-app="rules">
       <div class="icon-image"></div>
-      <span>säännöt.txt</span>
+      <span>veikkaus_säännöt.txt</span>
     </div>
-    
+
+    <div class="desktop-icon icon-kisarules" data-app="kisarules">
+      <div class="icon-image"></div>
+      <span>kisa_säännöt.txt</span>
+    </div>
+
+    <div class="desktop-icon icon-kartta" data-app="kartta">
+      <div class="icon-image"></div>
+      <span>kilpailu_alue.png</span>
+    </div>
+
+    <div class="desktop-icon icon-kohdelaji" data-app="kohdelaji">
+      <div class="icon-image"></div>
+      <span>kohdelaji.jpg</span>
+    </div>
+
+    <div class="desktop-icon icon-calendar" data-app="calendar">
+      <div class="icon-image"></div>
+      <span>Kalenteri</span>
+    </div>
+
     <div class="desktop-icon icon-recycleBin" data-app="recyclebin">
       <div class="icon-image"></div>
       <span>Roskakori</span>
@@ -210,6 +230,69 @@
         
         <div class="firebase-status">
           <div id="connectionStatus">Yhdistetään...</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Calendar Window -->
+  <div id="window-calendar" class="window app-window">
+    <div class="title-bar">
+      <div class="title-bar-text">Kalenteri - Kalakisat 2026</div>
+      <div class="title-bar-controls">
+        <button aria-label="Minimize" onclick="minimizeWindow('window-calendar')"></button>
+        <button aria-label="Maximize" onclick="maximizeWindow('window-calendar')"></button>
+        <button aria-label="Close" onclick="closeWindow('window-calendar')"></button>
+      </div>
+    </div>
+    <div class="window-body">
+      <div class="calendar-panel">
+        <h4 class="calendar-title">Elokuu 2026</h4>
+        <table class="calendar-table">
+          <thead>
+            <tr><th>Ma</th><th>Ti</th><th>Ke</th><th>To</th><th>Pe</th><th>La</th><th>Su</th></tr>
+          </thead>
+          <tbody>
+            <tr><td></td><td></td><td></td><td></td><td></td><td>1</td><td>2</td></tr>
+            <tr><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td><td>8</td><td>9</td></tr>
+            <tr><td>10</td><td>11</td><td>12</td><td>13</td><td>14</td><td>15</td><td>16</td></tr>
+            <tr><td>17</td><td>18</td><td>19</td><td>20</td><td>21</td><td>22</td><td>23</td></tr>
+            <tr><td>24</td><td>25</td><td>26</td><td>27</td><td class="calendar-event">28</td><td class="calendar-event">29</td><td class="calendar-event">30</td></tr>
+            <tr><td>31</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+          </tbody>
+        </table>
+        <div class="calendar-info">
+          <strong>KALAKISAT 2026</strong><br>
+          Pe 28.8 - Su 30.8.2026
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Winner Window -->
+  <div id="window-winner" class="window app-window">
+    <div class="title-bar">
+      <div class="title-bar-text">Kalakisat 2025 - Tulokset</div>
+      <div class="title-bar-controls">
+        <button aria-label="Minimize" onclick="minimizeWindow('window-winner')"></button>
+        <button aria-label="Maximize" onclick="maximizeWindow('window-winner')"></button>
+        <button aria-label="Close" onclick="closeWindow('window-winner')"></button>
+      </div>
+    </div>
+    <div class="window-body winner-body">
+      <div class="winner-content">
+        <img src="icons/kaikki/msg_information-0.png" alt="Info" class="winner-trophy">
+        <div class="winner-text">
+          <h3>Onneksi olkoon Matias!</h3>
+          <p>Kalakisojen 2025 voittaja!</p>
+          <div class="winner-results">
+            <strong>Lopputulokset:</strong>
+            <ol>
+              <li>Matias</li>
+              <li>Pyry</li>
+              <li>VP</li>
+            </ol>
+          </div>
         </div>
       </div>
     </div>

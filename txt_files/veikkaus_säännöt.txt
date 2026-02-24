@@ -11,14 +11,14 @@ KALAKISA VEIKKAUKSEN SÄÄNNÖT
 Kaava: Kokonaispotti / (Voittajalle asetettu summa)
 
 ESIM: Matiakselle on pelattu yhteensä 50€. Kokonaispotti on 250€
-    niin silloin 10€ panoksella Matiakseen voittaa 50€. 
+    niin silloin 10€ panoksella Matiakseen voittaa 50€.
 
 3. OIKEA TULOS
 - Vetosi on oikein vain jos valitsemasi kilpailija voittaa kisan
 
 4. VOITON MÄÄRITTÄMINEN
 - Kilpailun voittaja on se, joka saa suurimman kalan
-- Jos useampi saa saman pituuden niin kilpailu ratkaistaan 
+- Jos useampi saa saman pituuden niin kilpailu ratkaistaan
     seuraavaksi isoimman kalan perusteella ja sen jälkeen arvalla
 
 5. MAKSUT
@@ -33,6 +33,6 @@ ESIM: Matiakselle on pelattu yhteensä 50€. Kokonaispotti on 250€
 - Epäselvissä tilanteissa päättää kisatoimikunta (viime vuoden top3)
 - Valitukset tulee tehdä 24h sisällä tuloksen julkistamisesta
 - Päätökset ovat lopullisia
- 
+
 ========================
 Viimeksi päivitetty: 24.2.2026
