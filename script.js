@@ -10,6 +10,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   window.minimizeWindow = minimizeWindow;
   window.maximizeWindow = maximizeWindow;
   window.closeWindow = closeWindow;
+  window.closeImageViewer = closeImageViewer;
+  window.closeTextViewer = closeTextViewer;
   window.activateWindow = activateWindow;
   window.openWindow = openWindow;
   
@@ -53,10 +55,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   
   // Open only the startup windows
   startupWindows.forEach(windowId => {
-    const window = document.getElementById(windowId);
-    if (window) {
-      window.dataset.wasOpened = 'true';
-      window.style.display = 'block';
+    const win = document.getElementById(windowId);
+    if (win) {
+      win.dataset.wasOpened = 'true';
+      win.style.display = 'block';
     }
   });
   
@@ -73,6 +75,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
   
   updateTaskbar();
+  initStartMenu();
   initMobileEnhancements();
   initFileExplorer();
   showWinnerPopup();
@@ -85,32 +88,20 @@ function initDesktopSystem() {
   initWindowClickToFront();
 }
 
-// ================= Window Click-to-Front =================
 function initWindowClickToFront() {
-  // Add click listeners to all windows
-  document.querySelectorAll('.app-window').forEach(window => {
-    // Listen for clicks anywhere on the window
-    window.addEventListener('mousedown', (e) => {
-      // Don't interfere with dragging or button clicks
+  document.querySelectorAll('.app-window').forEach(win => {
+    win.addEventListener('mousedown', (e) => {
       if (e.target.closest('.title-bar') || e.target.tagName === 'BUTTON') {
         return;
       }
-      
-      // Bring window to front
-      activateWindow(window.id);
+      activateWindow(win.id);
     });
-    
-    // Also listen for clicks on the title bar (in addition to dragging)
-    const titleBar = window.querySelector('.title-bar');
+
+    const titleBar = win.querySelector('.title-bar');
     if (titleBar) {
       titleBar.addEventListener('mousedown', (e) => {
-        // Don't interfere with button clicks
-        if (e.target.tagName === 'BUTTON') {
-          return;
-        }
-        
-        // Bring window to front
-        activateWindow(window.id);
+        if (e.target.tagName === 'BUTTON') return;
+        activateWindow(win.id);
       });
     }
   });
@@ -337,13 +328,45 @@ function showWinnerPopup() {
 // ================= Clock =================
 function updateTime() {
   const timeEl = document.getElementById('currentTime');
+  const dateEl = document.getElementById('currentDate');
   if (!timeEl) return;
-  
+
   const now = new Date();
   const hh = String(now.getHours()).padStart(2, '0');
   const mm = String(now.getMinutes()).padStart(2, '0');
   const ss = String(now.getSeconds()).padStart(2, '0');
   timeEl.textContent = `${hh}:${mm}:${ss}`;
+
+  if (dateEl) {
+    dateEl.textContent = now.toLocaleDateString('fi-FI');
+  }
+}
+
+// ================= Start Menu =================
+function initStartMenu() {
+  const startBtn = document.getElementById('startBtn');
+  const startMenu = document.getElementById('startMenu');
+  if (!startBtn || !startMenu) return;
+
+  startBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const isOpen = startMenu.style.display !== 'none';
+    startMenu.style.display = isOpen ? 'none' : 'flex';
+  });
+
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('#startMenu') && !e.target.closest('#startBtn')) {
+      startMenu.style.display = 'none';
+    }
+  });
+
+  startMenu.querySelectorAll('.start-menu-item').forEach(item => {
+    item.addEventListener('click', () => {
+      const action = item.dataset.action;
+      startMenu.style.display = 'none';
+      if (action) handleIconOpen(action);
+    });
+  });
 }
 
 // ================= Mobile Detection & Handling =================
@@ -403,7 +426,9 @@ function handleIconOpen(app) {
   } else if (app === 'kartta') {
     openImageViewer('kilpailu_alue.png');
   } else if (app === 'kohdelaji') {
-    openImageViewer('kohdelaji.jpg');
+    openImageViewer('kohdelaji.png');
+  } else if (app === 'mittausohje') {
+    openImageViewer('mittausohje.png');
   } else {
     const targetId = app === 'betting' ? 'window-betting'
                    : app === 'betsdata' ? 'window-bets'
@@ -512,8 +537,8 @@ const driveContents = {
     files: ['säännöt-2023.txt','säännöt-2024.txt','porttikiellot-2023.txt']
   },
   'C:': {
-    folders: ['Windows'],
-    files: []
+    folders: ['Windows', 'Ohjelmat', 'Käyttäjät'],
+    files: ['autoexec.bat', 'config.sys']
   },
   'D:': {
     folders: ['Varmuuskopiot'],
@@ -541,13 +566,57 @@ const folderContents = {
   },
   'Kuvat': {
     folders: [],
-    files: ['matun_hauki.jpg']
+    files: ['matun_hauki.jpg', 'kohdelaji.png', 'mittausohje.png']
   },
   'Varmuuskopiot': {
     folders: [],
     files: []
   },
   'Windows': {
+    folders: ['System32', 'Fonts', 'Temp'],
+    files: ['win.ini', 'notepad.exe', 'explorer.exe']
+  },
+  'System32': {
+    folders: ['drivers'],
+    files: ['cmd.exe', 'calc.exe', 'mspaint.exe']
+  },
+  'drivers': {
+    folders: [],
+    files: ['keyboard.sys', 'mouse.sys', 'vga.sys']
+  },
+  'Fonts': {
+    folders: [],
+    files: ['arial.ttf', 'times.ttf', 'comic.ttf']
+  },
+  'Temp': {
+    folders: [],
+    files: []
+  },
+  'Ohjelmat': {
+    folders: ['Internet Explorer', 'Kalakisat Veikkaus'],
+    files: []
+  },
+  'Internet Explorer': {
+    folders: [],
+    files: ['iexplore.exe']
+  },
+  'Kalakisat Veikkaus': {
+    folders: [],
+    files: ['kalakisat.exe', 'readme.txt']
+  },
+  'Käyttäjät': {
+    folders: ['Kalastaja'],
+    files: []
+  },
+  'Kalastaja': {
+    folders: ['Omat tiedostot', 'Työpöytä'],
+    files: []
+  },
+  'Omat tiedostot': {
+    folders: [],
+    files: ['muistiinpanot.txt']
+  },
+  'Työpöytä': {
     folders: [],
     files: []
   },
@@ -825,44 +894,27 @@ function openFile(fileName) {
     return;
   }
   
-  // For non-supported files or deleted files, show the existing message
-  const message = document.createElement('div');
-  message.style.cssText = `
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: #c0c0c0;
-    border: 2px outset #c0c0c0;
-    padding: 20px;
-    z-index: 10000;
-    font-size: 14px;
-    text-align: center;
-    min-width: 250px;
-  `;
-  
-  let messageText;
+  let title, messageText;
   if (isDeleted) {
+    title = 'Roskakori';
     messageText = `Poistettu tiedosto: ${fileName}<br><small>Tiedosto on roskakorissa</small>`;
   } else {
+    title = 'Virhe';
     messageText = `Avataan tiedosto: ${fileName}<br><small>Tiedostolle ei ole ohjelmaa</small>`;
   }
-  
-  message.innerHTML = `
-    <div>${messageText}</div>
-    <div style="margin-top: 15px;">
-      <button onclick="this.parentElement.parentElement.remove()" 
-              style="padding: 6px 16px;">OK</button>
-    </div>
-  `;
-  
-  document.body.appendChild(message);
-  
-  setTimeout(() => {
-    if (message.parentElement) {
-      message.remove();
-    }
-  }, 4000);
+  showAlert(title, messageText);
+}
+
+function showAlert(title, messageHtml) {
+  const titleEl = document.getElementById('alertTitle');
+  const msgEl = document.getElementById('alertMessage');
+  if (titleEl) titleEl.textContent = title;
+  if (msgEl) msgEl.innerHTML = messageHtml;
+  if (isMobile()) {
+    openWindowMobile('window-alert');
+  } else {
+    openWindow('window-alert');
+  }
 }
 
 
@@ -875,29 +927,52 @@ function goBack() {
   }
 }
 
-// Text viewer
+// Text viewer - creates a separate window per file
+let textViewerCount = 0;
+
 function openTextViewer(fileName) {
-  const win = document.getElementById('window-textviewer');
-  const titleBar = win.querySelector('.title-bar-text');
-  const content = document.getElementById('textViewerContent');
-  
-  if (!win || !titleBar || !content) {
-    console.error('Text viewer elements not found');
-    return;
-  }
-  
-  // Set the window title to the file name
-  titleBar.textContent = fileName;
-  
-  // Load the text file content
+  textViewerCount++;
+  const winId = `window-textviewer-${textViewerCount}`;
+  const offset = (textViewerCount - 1) * 30;
+
+  const win = document.createElement('div');
+  win.id = winId;
+  win.className = 'window app-window textviewer-window';
+  win.style.top = (170 + offset) + 'px';
+  win.style.left = (400 + offset) + 'px';
+  win.style.display = 'none';
+
+  win.innerHTML = `
+    <div class="title-bar">
+      <div class="title-bar-text">${fileName}</div>
+      <div class="title-bar-controls">
+        <button aria-label="Minimize" onclick="minimizeWindow('${winId}')"></button>
+        <button aria-label="Maximize" onclick="maximizeWindow('${winId}')"></button>
+        <button aria-label="Close" onclick="closeTextViewer('${winId}')"></button>
+      </div>
+    </div>
+    <div class="window-body">
+      <div class="notepad-content">Ladataan tiedostoa...</div>
+    </div>
+  `;
+
+  document.body.appendChild(win);
+  setupWindowInteractions(win);
+
+  const content = win.querySelector('.notepad-content');
   loadTextFile(fileName, content);
-  
-  // Show and activate the window
+
   if (isMobile()) {
-    openWindowMobile('window-textviewer');
+    openWindowMobile(winId);
   } else {
-    openWindow('window-textviewer');
+    openWindow(winId);
   }
+}
+
+function closeTextViewer(winId) {
+  closeWindow(winId);
+  const win = document.getElementById(winId);
+  if (win) win.remove();
 }
 // Loading text files
 function loadTextFile(fileName, contentElement) {
@@ -922,39 +997,73 @@ function loadTextFile(fileName, contentElement) {
     });
 }
 
-// Image viewer simple
+// Image viewer - creates a separate window per image
+let imageViewerCount = 0;
+
 function openImageViewer(fileName) {
-  const win = document.getElementById('window-imageviewer');
-  const titleBar = win.querySelector('.title-bar-text');
-  const image = document.getElementById('viewerImage');
-  
-  if (!win || !titleBar || !image) {
-    console.error('Image viewer elements not found');
-    return;
-  }
-  
-  // Set the window title to the image name
-  titleBar.textContent = fileName;
-  
-  // Create the image path based on current location
-  let imagePath = getImagePath(fileName);
-  
-  // Set the image source
-  image.src = imagePath;
-  image.alt = `Viewing ${fileName}`;
-  
-  // Handle image load error
-  image.onerror = function() {
-    // If image fails to load, show a placeholder
-    this.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjE1MCIgdmlld0JveD0iMCAwIDIwMCAxNTAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMTUwIiBmaWxsPSIjRjBGMEYwIiBzdHJva2U9IiNEMEQwRDAiLz4KPHN2ZyB4PSI3NSIgeT0iNDAiIHdpZHRoPSI1MCIgaGVpZ2h0PSI1MCIgdmlld0JveD0iMCAwIDUwIDUwIiBmaWxsPSIjQzBDMEMwIj4KPHN2ZyB3aWR0aD0iNTAiIGhlaWdodD0iNTAiIHZpZXdCb3g9IjAgMCA1MCA1MCIgZmlsbD0ibm9uZSI+CjxwYXRoIGQ9Ik0xNS42MjUgMTAuNDE2N0gyOC4xMjVMMzEuMjUgMTMuNTQxN0g0MS42NjY3VjQxLjY2NjdIOC4zMzMzM1YxMy41NDE3SDE1LjYyNVYxMC40MTY3WiIgc3Ryb2tlPSIjOTk5OTk5IiBzdHJva2Utd2lkdGg9IjEuNSIgZmlsbD0ibm9uZSIvPgo8L3N2Zz4KPHN2Zz4KPHR4dCB4PSI1MCIgeT0iMTEwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTQiIGZpbGw9IiM2NjY2NjYiPkltYWdlIG5vdCBmb3VuZDwvdGV4dD4KPHN2Zz4=';
-    this.alt = `Kuvaa ei löydy: ${fileName}`;
-  };
-  
-  // Show and activate the window
+  imageViewerCount++;
+  const winId = `window-imageviewer-${imageViewerCount}`;
+  const offset = (imageViewerCount - 1) * 30;
+
+  const win = document.createElement('div');
+  win.id = winId;
+  win.className = 'window app-window imageviewer-window';
+  win.style.top = (120 + offset) + 'px';
+  win.style.left = (300 + offset) + 'px';
+  win.style.display = 'none';
+
+  win.innerHTML = `
+    <div class="title-bar">
+      <div class="title-bar-text">${fileName}</div>
+      <div class="title-bar-controls">
+        <button aria-label="Minimize" onclick="minimizeWindow('${winId}')"></button>
+        <button aria-label="Maximize" onclick="maximizeWindow('${winId}')"></button>
+        <button aria-label="Close" onclick="closeImageViewer('${winId}')"></button>
+      </div>
+    </div>
+    <div class="window-body">
+      <div class="image-viewer-content">
+        <img src="${getImagePath(fileName)}" alt="${fileName}" onerror="this.alt='Kuvaa ei löydy: ${fileName}'" />
+      </div>
+    </div>
+  `;
+
+  document.body.appendChild(win);
+
+  // Set up dragging and click-to-front for the new window
+  setupWindowInteractions(win);
+
   if (isMobile()) {
-    openWindowMobile('window-imageviewer');
+    openWindowMobile(winId);
   } else {
-    openWindow('window-imageviewer');
+    openWindow(winId);
+  }
+}
+
+function closeImageViewer(winId) {
+  closeWindow(winId);
+  const win = document.getElementById(winId);
+  if (win) win.remove();
+}
+
+function setupWindowInteractions(win) {
+  win.addEventListener('mousedown', (e) => {
+    if (e.target.closest('.title-bar') || e.target.tagName === 'BUTTON') return;
+    activateWindow(win.id);
+  });
+
+  const titleBar = win.querySelector('.title-bar');
+  if (titleBar) {
+    titleBar.addEventListener('mousedown', (e) => {
+      if (e.target.tagName === 'BUTTON') return;
+      activateWindow(win.id);
+      if (e.target.closest('.title-bar-controls')) return;
+      isDragging = true;
+      dragWindow = win;
+      const rect = win.getBoundingClientRect();
+      dragOffset = { x: e.clientX - rect.left, y: e.clientY - rect.top };
+      e.preventDefault();
+    });
   }
 }
 
@@ -987,10 +1096,12 @@ function taskbarIconForWindow(id) {
     case 'window-rules':      return 'icons/txt-file.png';
     case 'window-recycle':    return 'icons/recycle-bin.png';
     case 'window-explorer':   return 'icons/folder.png';
-    case 'window-textviewer': return 'icons/txt-file.png';
-    case 'window-imageviewer': return 'icons/img.png';
     case 'window-calendar':   return 'icons/kaikki/calendar-0.png';
     case 'window-winner':     return 'icons/kaikki/msg_information-0.png';
-    default: return 'icons/windows.png';
+    case 'window-alert':      return 'icons/kaikki/msg_warning-0.png';
+    default:
+      if (id.startsWith('window-imageviewer-')) return 'icons/img.png';
+      if (id.startsWith('window-textviewer-')) return 'icons/txt-file.png';
+      return 'icons/windows.png';
   }
 }

@@ -50,7 +50,12 @@
 
     <div class="desktop-icon icon-kohdelaji" data-app="kohdelaji">
       <div class="icon-image"></div>
-      <span>kohdelaji.jpg</span>
+      <span>kohdelaji.png</span>
+    </div>
+
+    <div class="desktop-icon icon-mittausohje" data-app="mittausohje">
+      <div class="icon-image"></div>
+      <span>mittausohje.png</span>
     </div>
 
     <div class="desktop-icon icon-calendar" data-app="calendar">
@@ -90,38 +95,10 @@
     </div>
   </div>
 
-  <!-- Text Viewer Window -->
-  <div id="window-textviewer" class="window app-window">
-    <div class="title-bar">
-      <div class="title-bar-text">Text Viewer</div>
-      <div class="title-bar-controls">
-        <button aria-label="Minimize" onclick="minimizeWindow('window-textviewer')"></button>
-        <button aria-label="Maximize" onclick="maximizeWindow('window-textviewer')"></button>
-        <button aria-label="Close" onclick="closeWindow('window-textviewer')"></button>
-      </div>
-    </div>
-    <div class="window-body">
-      <div id="textViewerContent" class="notepad-content">Ladataan tiedostoa...</div>
-    </div>
-  </div>
+  <!-- Text Viewer Windows are created dynamically by script.js -->
 
 
-  <!-- Image Viewer Window -->
-  <div id="window-imageviewer" class="window app-window">
-    <div class="title-bar">
-      <div class="title-bar-text">Image Viewer</div>
-      <div class="title-bar-controls">
-        <button aria-label="Minimize" onclick="minimizeWindow('window-imageviewer')"></button>
-        <button aria-label="Maximize" onclick="maximizeWindow('window-imageviewer')"></button>
-        <button aria-label="Close" onclick="closeWindow('window-imageviewer')"></button>
-      </div>
-    </div>
-    <div class="window-body">
-      <div class="image-viewer-content">
-        <img id="viewerImage" src="" alt="Viewing image" />
-      </div>
-    </div>
-  </div>
+  <!-- Image Viewer Windows are created dynamically by script.js -->
 
   <!-- Betting Window -->
   <div id="window-betting" class="window app-window active">
@@ -298,6 +275,55 @@
     </div>
   </div>
 
+  <!-- Alert Dialog -->
+  <div id="window-alert" class="window app-window">
+    <div class="title-bar">
+      <div class="title-bar-text" id="alertTitle">Ilmoitus</div>
+      <div class="title-bar-controls">
+        <button aria-label="Close" onclick="closeWindow('window-alert')"></button>
+      </div>
+    </div>
+    <div class="window-body" style="padding: 16px; text-align: center;">
+      <div style="display: flex; gap: 12px; align-items: flex-start;">
+        <img src="icons/kaikki/msg_warning-0.png" alt="" style="width: 32px; height: 32px; image-rendering: pixelated; flex-shrink: 0;">
+        <div id="alertMessage" style="text-align: left; font-size: 14px;"></div>
+      </div>
+      <button onclick="closeWindow('window-alert')" style="padding: 4px 24px; margin-top: 12px;">OK</button>
+    </div>
+  </div>
+
+  <!-- ================= START MENU ================= -->
+  <div id="startMenu" class="start-menu" style="display: none;">
+    <div class="start-menu-banner">
+      <span>Kalakisat</span>
+    </div>
+    <div class="start-menu-items">
+      <div class="start-menu-item" data-action="betting">
+        <img src="icons/betting.png" alt=""><span>Veikkaus</span>
+      </div>
+      <div class="start-menu-item" data-action="betsdata">
+        <img src="icons/bets.png" alt=""><span>Veikkaukset</span>
+      </div>
+      <div class="start-menu-item" data-action="stats">
+        <img src="icons/chart.png" alt=""><span>Tilastot</span>
+      </div>
+      <div class="start-menu-separator"></div>
+      <div class="start-menu-item" data-action="mycomputer">
+        <img src="icons/my-computer.png" alt=""><span>Oma tietokone</span>
+      </div>
+      <div class="start-menu-item" data-action="calendar">
+        <img src="icons/kaikki/calendar-0.png" alt=""><span>Kalenteri</span>
+      </div>
+      <div class="start-menu-separator"></div>
+      <div class="start-menu-item" data-action="rules">
+        <img src="icons/txt-file.png" alt=""><span>Veikkauksen säännöt</span>
+      </div>
+      <div class="start-menu-item" data-action="kisarules">
+        <img src="icons/txt-file.png" alt=""><span>Kilpailun säännöt</span>
+      </div>
+    </div>
+  </div>
+
   <!-- ================= TASKBAR ================= -->
   <div class="taskbar">
     <button class="start-button" id="startBtn">
@@ -305,7 +331,15 @@
       Käynnistä
     </button>
     <div class="taskbar-buttons" id="taskbarButtons"></div>
-    <div class="taskbar-time"><span id="currentTime">--:--:--</span></div>
+    <div class="taskbar-tray">
+      <span class="tray-lang">FI</span>
+      <img src="icons/kaikki/loudspeaker_wave-0.png" alt="Sound" class="tray-icon">
+      <img src="icons/kaikki/network_normal_two_pcs-0.png" alt="Network" class="tray-icon">
+      <div class="tray-clock">
+        <span id="currentTime">--:--:--</span>
+        <span id="currentDate" class="tray-date"></span>
+      </div>
+    </div>
   </div>
 
 

@@ -295,15 +295,12 @@ function updateOddsDisplay() {
 }
 
 function calculateOdds(voittaja, currentAmount = 0) {
-  const totalBets = bets.length || 1;
   const totalAmount = bets.reduce((sum, bet) => sum + bet.amount, 0) + currentAmount;
-  
-  // Find matching bets (same winner)
-  const matching = bets.filter(b => 
+
+  const matching = bets.filter(b =>
     b.voittaja.toLowerCase() === voittaja.toLowerCase()
   );
-  
-  const matchingCount = matching.length;
+
   const matchingAmount = matching.reduce((sum, bet) => sum + bet.amount, 0) + currentAmount;
   
   // Calculate odds: Total pool / Amount bet on this winner
@@ -368,16 +365,16 @@ function updateStats() {
   if (winnerUl) {
     winnerUl.innerHTML = Object.keys(byWinner)
       .sort((a,b) => byWinner[b].amount - byWinner[a].amount) // Sort by amount desc
-      .map(name => `<li><span>${name}</span><strong>${formatCurrency(byWinner[name].amount)} (${byWinner[name].count} vetoa)</strong></li>`)
+      .map(name => `<li><span>${escapeHtml(name)}</span><strong>${formatCurrency(byWinner[name].amount)} (${byWinner[name].count} vetoa)</strong></li>`)
       .join('') || '<li>-</li>';
   }
-  
+
   // Update player stats list
   const playerUl = document.getElementById('statsByPlayer');
   if (playerUl) {
     playerUl.innerHTML = Object.keys(byPlayer)
-      .sort((a,b) => byPlayer[b].amount - byPlayer[a].amount) // Sort by amount desc
-      .map(name => `<li><span>${name}</span><strong>${formatCurrency(byPlayer[name].amount)} (${byPlayer[name].count} vetoa)</strong></li>`)
+      .sort((a,b) => byPlayer[b].amount - byPlayer[a].amount)
+      .map(name => `<li><span>${escapeHtml(name)}</span><strong>${formatCurrency(byPlayer[name].amount)} (${byPlayer[name].count} vetoa)</strong></li>`)
       .join('') || '<li>-</li>';
   }
   
@@ -412,10 +409,10 @@ function updateWinnerChart(byWinner) {
     chartHTML += `
       <div class="chart-bar-container">
         <div class="chart-bar" style="height: ${barHeight}%; background-color: ${barColor};" 
-             title="${winner}: ${formatCurrency(data.amount)} (${data.count} vetoa)">
+             title="${escapeHtml(winner)}: ${formatCurrency(data.amount)} (${data.count} vetoa)">
           <div class="bar-value">${formatCurrency(data.amount)}</div>
         </div>
-        <div class="bar-label">${winner}</div>
+        <div class="bar-label">${escapeHtml(winner)}</div>
       </div>
     `;
   });
@@ -439,7 +436,7 @@ function updateTopBets() {
   const top3 = sortedBets.slice(0, 3);
   
   topBetsEl.innerHTML = top3.map((bet, index) => {
-    return `<li><span>Veikkaaja: ${bet.veikkaaja} → ${bet.voittaja}</span><strong>${formatCurrency(bet.amount)}</strong></li>`;
+    return `<li><span>Veikkaaja: ${escapeHtml(bet.veikkaaja)} → ${escapeHtml(bet.voittaja)}</span><strong>${formatCurrency(bet.amount)}</strong></li>`;
   }).join('');
 }
 
@@ -475,7 +472,7 @@ function renderBets() {
     const playerBets = groups[name];
     const totalAmount = playerBets.reduce((sum, bet) => sum + bet.amount, 0);
     
-    html += `<div class="group-header">${name} (${playerBets.length} vetoa, yhteensä ${formatCurrency(totalAmount)})</div>`;
+    html += `<div class="group-header">${escapeHtml(name)} (${playerBets.length} vetoa, yhteensä ${formatCurrency(totalAmount)})</div>`;
     
     // Show bets in chronological order (newest first within each player)
     playerBets.forEach(bet => {
@@ -487,7 +484,7 @@ function renderBets() {
             <span class="bet-time">${timeDiff}</span>
           </div>
           <div>
-            <div><strong>Voittaja:</strong> ${bet.voittaja}</div>
+            <div><strong>Voittaja:</strong> ${escapeHtml(bet.voittaja)}</div>
             <div class="bet-timestamp">${formatDate(bet.placedAt)}</div>
           </div>
         </div>`;
@@ -570,6 +567,12 @@ function initBettingEventListeners() {
 }
 
 // ================= Utilities =================
+function escapeHtml(str) {
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
 function formatCurrency(amount) {
   return new Intl.NumberFormat('fi-FI', { style: 'currency', currency: 'EUR' }).format(amount || 0);
 }
