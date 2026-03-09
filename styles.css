@@ -835,15 +835,40 @@ textarea { min-height: 160px; }
   }
   
   /* Desktop layout */
-  #desktop { 
-    position: relative;
-    height: auto; 
-    min-height: calc(100vh - 90px);
-    padding: 15px 10px 10px 15px;
+  #desktop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 40px;
+    height: auto;
+    min-height: unset;
+    padding: 10px 8px 10px 10px;
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
-    gap: 10px;
+    flex-wrap: wrap;
+    align-content: flex-start;
+    gap: 4px;
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+
+  .desktop-icon {
+    position: relative !important;
+    top: auto !important;
+    left: auto !important;
+    width: 76px;
+    min-height: 72px;
+  }
+
+  .icon-image {
+    width: 36px;
+    height: 36px;
+  }
+
+  .desktop-icon span {
+    font-size: 11px;
+    max-width: 72px;
   }
   
   /* Force all windows full screen */
@@ -968,6 +993,9 @@ textarea { min-height: 160px; }
     height: 28px;
     min-width: 28px;
     min-height: 28px;
+    background-size: 18px 18px;
+    background-position: center;
+    background-repeat: no-repeat;
   }
 
   .image-viewer-content {
